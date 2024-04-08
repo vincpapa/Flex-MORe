@@ -60,6 +60,7 @@ class MovieLens1M(DatasetLoader):
         self.fpath_test = os.path.join(data_dir, 'test.tsv')
         self.fpath_val = os.path.join(data_dir, 'val.tsv')
         self.fpath_user = os.path.join(data_dir, 'users.dat')
+        self.fpath_user_act = os.path.join(data_dir, 'user_groups.tsv')
 
     def load(self):
         # Load data
@@ -77,8 +78,13 @@ class MovieLens1M(DatasetLoader):
                               engine='python',
                               names=['user', 'gender', 'age', 'occupation', 'Zip-code'],
                               usecols=['user', 'gender'])
+
+        act_user = pd.read_csv(self.fpath_user_act,
+                               sep='\t',
+                               names=['user', 'activity_level'])
         df_rate = pd.concat([train, val, test], ignore_index=True)
         df = pd.merge(df_rate, df_user, on='user')
+        df = pd.merge(df, act_user, on='user')
 
         return df, train, test, val
 
@@ -90,6 +96,7 @@ class LastFM(DatasetLoader):
         self.fpath_test = os.path.join(data_dir, 'test.tsv')
         self.fpath_val = os.path.join(data_dir, 'val.tsv')
         self.fpath_user = os.path.join(data_dir, 'usersha1-profile.tsv')
+        self.fpath_user_act = os.path.join(data_dir, 'user_groups.tsv')
 
     def load(self):
         # Load data
@@ -106,8 +113,12 @@ class LastFM(DatasetLoader):
                               sep='\t',
                               names=['user', 'gender', 'age', 'nationality', 'date'],
                               usecols=['user', 'gender'])
+        act_user = pd.read_csv(self.fpath_user_act,
+                               sep='\t',
+                               names=['user', 'activity_level'])
         df_rate = pd.concat([train, val, test], ignore_index=True)
         df = pd.merge(df_rate, df_user, on='user')
+        df = pd.merge(df, act_user, on='user')
 
         return df, train, test, val
 
@@ -118,6 +129,7 @@ class AmazonBaby(DatasetLoader):
         self.fpath_train = os.path.join(data_dir, 'train.tsv')
         self.fpath_test = os.path.join(data_dir, 'test.tsv')
         self.fpath_val = os.path.join(data_dir, 'val.tsv')
+        self.fpath_user_act = os.path.join(data_dir, 'user_groups.tsv')
 
     def load(self):
         # Load data
@@ -131,6 +143,11 @@ class AmazonBaby(DatasetLoader):
                             sep='\t',
                             names=['user', 'item', 'rate', 'timestamp'])
         df = pd.concat([train[['user', 'item', 'rate']], val[['user', 'item', 'rate']], test[['user', 'item', 'rate']]], ignore_index=True)
+        act_user = pd.read_csv(self.fpath_user_act,
+                               sep='\t',
+                               names=['user', 'activity_level'])
+
+        df = pd.merge(df, act_user, on='user')
 
         return df, train, test, val
 
@@ -140,6 +157,7 @@ class FacebookBooks(DatasetLoader):
         self.fpath_train = os.path.join(data_dir, 'train.tsv')
         self.fpath_test = os.path.join(data_dir, 'test.tsv')
         self.fpath_val = os.path.join(data_dir, 'val.tsv')
+        self.fpath_user_act = os.path.join(data_dir, 'user_groups.tsv')
 
     def load(self):
         # Load data
@@ -152,7 +170,11 @@ class FacebookBooks(DatasetLoader):
         val = pd.read_csv(self.fpath_val,
                             sep='\t',
                             names=['user', 'item', 'rate'])
+        act_user = pd.read_csv(self.fpath_user_act,
+                               sep='\t',
+                               names=['user', 'activity_level'])
         df = pd.concat([train, val, test], ignore_index=True)
+        df = pd.merge(df, act_user, on='user')
 
         return df, train, test, val
 
@@ -319,6 +341,23 @@ def gender_index(df):
         return [], []
 
 
+def activity_index(df):
+    try:
+        gender_dic = df.groupby('user')['activity_level'].apply(list).to_dict()
+        index_F = []
+        index_M = []
+        for i in range(0, len(gender_dic)):
+            if 0 in gender_dic[i]:
+                index_F.append(i)
+            else:
+                index_M.append(i)
+        index_F = np.array(index_F)
+        index_M = np.array(index_M)
+        return index_F, index_M
+    except:
+        return [], []
+
+
 def pop_items(df):
     transactions = df.size
     pop_treshold = transactions * 0.2
@@ -469,7 +508,8 @@ def preprocessing(settings):
                'train_user_list': train_user_list, 'val_user_list': val_user_list, 'test_user_list': test_user_list,
                'train_pair': train_pair}
 
-    index_F, index_M = gender_index(df)
+    # index_F, index_M = gender_index(df)
+    index_F, index_M = activity_index(df)
     pop_mask, popular_dict = popularity_index(df)
     short_long, long_tail, short_head = pop_items(df)
     train_aplt = train_APLT(train, long_tail)
