@@ -5,7 +5,7 @@ setting:
   wrapper: PDU_SCALE # Multi-Objective Method
   epochs: 500 # Number of epochs
   validation_rate: 10 # Period of evaluation during training
-  validation_metric: nDCG@20 # Metric of evaluation during training
+  validation_metric: ndcg@20 # Metric of evaluation during training
   batch_size: 2048 # Batch size
 hyperparameters:
   dim: [64] # Dimension for embedding
