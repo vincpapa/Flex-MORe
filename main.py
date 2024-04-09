@@ -775,6 +775,8 @@ if __name__ == '__main__':
         store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
     maximumValue = max(store_validation.values(), key=lambda k: k[1])
     maxKey = next(k for k, v in store_validation.items() if v == maximumValue)
+    print(f'maxKey: {maxKey}')
+    print(f'maximumValue: {maximumValue}')
 
 
 
