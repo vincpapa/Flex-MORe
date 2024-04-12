@@ -10,7 +10,7 @@ topk = 50
 
 
 def fairness_optimisation(fairness='N', uepsilon=0.000005, iepsilon = 0.0000005):
-    print(f"Runing fairness optimisation on '{fairness}', {format(uepsilon, 'f')}, {format(iepsilon, 'f')}")
+    print(f"Running fairness optimization on '{fairness}', {format(uepsilon, 'f')}, {format(iepsilon, 'f')}")
     # V1: No. of users
     # V2: No. of top items (topk)
     # V3: No. of user groups
@@ -57,8 +57,8 @@ def fairness_optimisation(fairness='N', uepsilon=0.000005, iepsilon = 0.0000005)
         model += user_dcg[i] == xsum((W[i][j] * Ahelp[i][j]) for j in V2)
         model += user_ndcg[i] == user_dcg[i] / user_idcg_i
 
-        model += user_precision[i]==xsum((W[i][j] * Ahelp[i][j]) for j in V2) / k
-        model += user_recall[i]==xsum((W[i][j] * Ahelp[i][j]) for j in V2) / len(train_checkins[i])
+        model += user_precision[i] == xsum((W[i][j] * Ahelp[i][j]) for j in V2) / k
+        model += user_recall[i] == xsum((W[i][j] * Ahelp[i][j]) for j in V2) / len(train_checkins[i])
 
     for k in V3:
         model += group_ndcg_v[k] == xsum(user_dcg[i] * U[i][k] for i in V1)
@@ -91,7 +91,8 @@ def to_mapping(mapping, x):
 
 dataset_list = ['amazon_baby', 'facebook_books', 'ml-1m']
 for dataset_name in dataset_list:
-    dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(dataset_name)
+    settings = {'data': dataset_name}
+    dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(settings)
     train_checkins = {}
     for i, el in enumerate(dataset['train_user_list']):
         key, value = i, set(el)
@@ -104,7 +105,11 @@ for dataset_name in dataset_list:
     longtail_item_ids = set(long_tail)
     recs = glob('arrays/BPRMF/*.npz')
     U = np.zeros([int(dataset['user_size']), no_user_groups])
-    U[:, 1] = 1
+    for u in index_F:
+        U[u][0] = 1
+    for u in index_M:
+        U[u][1] = 1
+    # U[:, 1] = 1
     for rec in recs:
         if dataset_name in rec:
             # df = pd.read_csv(rec, sep='\t', names=['user', 'item', 'rate'])
@@ -139,7 +144,7 @@ for dataset_name in dataset_list:
                         Ihelp[uid][lid][0] = 1
                     elif P[uid][lid] in longtail_item_ids:
                         Ihelp[uid][lid][1] = 1
-            for fair_mode in ['P']:
+            for fair_mode in ['CP']:
                 if fair_mode == 'N':
                     W, item_group = fairness_optimisation(fairness=fair_mode)
                 elif fair_mode == 'C':
@@ -165,6 +170,8 @@ for dataset_name in dataset_list:
                         rec_elliot = pd.DataFrame(N_X, columns=['user', 'item'])
                         rec_elliot['user'] = rec_elliot['user'].map(lambda x: conv_mapping(dataset['user_mapping'], x))
                         rec_elliot['item'] = rec_elliot['item'].map(lambda x: conv_mapping(dataset['item_mapping'], x))
+                        if not os.path.exists(f'recs/'):
+                            os.makedirs(f'recs/')
                         if 'BPRMF' in rec:
                             rec_elliot.to_csv(f'recs/BPRMF/BPRMF_PFAIR_{item_eps}_{dataset_name}.tsv',
                                               sep='\t', index=False, header=False)
@@ -175,6 +182,38 @@ for dataset_name in dataset_list:
                         # rec_elliot.to_csv(new_recs_string,
                         #                   sep='\t', index=False, header=False)
                 elif fair_mode == 'CP':
-                    for user_eps in [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
-                        for item_eps in [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
+                    for user_eps in [0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
+                        for item_eps in [0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
                             W, item_group = fairness_optimisation(fairness=fair_mode, uepsilon=user_eps, iepsilon=item_eps)
+                            # W, item_group = fairness_optimisation(fairness=fair_mode, uepsilon=0, iepsilon=item_eps)
+                            R = np.zeros([int(dataset['user_size']), topk])
+                            for uid in range(int(dataset['user_size'])):
+                                for j in range(topk):
+                                    R[uid][j] = W[uid][j].x
+                            N_P = (P + 1) * R
+                            N_X = np.zeros([int(dataset['user_size']) * 20, 2])
+                            j = 0
+                            for u in range(N_P.shape[0]):
+                                for i in range(N_P.shape[1]):
+                                    if N_P[u][i] != 0:
+                                        N_X[j][0] = int(u)
+                                        N_X[j][1] = int(N_P[u][i])
+                                        j += 1
+                            N_X[:, 1] = N_X[:, 1] - 1
+                            rec_elliot = pd.DataFrame(N_X, columns=['user', 'item'])
+                            rec_elliot['user'] = rec_elliot['user'].map(
+                                lambda x: conv_mapping(dataset['user_mapping'], x))
+                            rec_elliot['item'] = rec_elliot['item'].map(
+                                lambda x: conv_mapping(dataset['item_mapping'], x))
+                            if not os.path.exists(f'recs/'):
+                                os.makedirs(f'recs/')
+                            if 'BPRMF' in rec:
+                                # if not os.path.exists(f'recs/BPRMF'):
+                                #     os.makedirs(f'recs/BPRMF/')
+                                rec_elliot.to_csv(f'results/{dataset_name}/recs/BPRMF_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
+                                                  sep='\t', index=False, header=False)
+                            elif 'LightGCN' in rec:
+                                # if not os.path.exists(f'recs/LightGCN'):
+                                #     os.makedirs(f'recs/LightGCN/')
+                                rec_elliot.to_csv(f'results/{dataset_name}/recs/LightGCN_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
+                                                  sep='\t', index=False, header=False)

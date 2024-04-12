@@ -183,14 +183,13 @@ def exp_string(i, args):
                     if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric']).replace('.', '$')
     return str(i) + '-' + head + '-' + tail
 
+
 def exp_setting(i, setting):
     return '-'.join(f'{key}={value}' for key, value in vars(setting).items()
                     if key in ['backbone', 'mo_method', 'mode', 'data'])
 
 
-
-
-def train(args, exp_id):
+def train(args, exp_id, val_best):
     # pre-sample a small set of negative samples
     t1 = time.time()
     user_neg_items = neg_item_pre_sampling(train_matrix, num_neg_candidates=500)
@@ -559,6 +558,15 @@ def train(args, exp_id):
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')
                 val_metric = compute_metrics(val_user_list, pred_list, args.metric)
+                if val_metric > val_best:
+                    val_best = val_metric
+                    if not os.path.exists(f'arrays/'):
+                        os.makedirs(f'arrays/')
+                    if not os.path.exists(f'arrays/{args.data}/'):
+                        os.makedirs(f'arrays/{args.data}/')
+                    #  np.savez_compressed(f'arrays/{args.data}/{exp_id}.npz', model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
+                    np.savez_compressed(f'arrays/{args.data}/{args.backbone}_{args.mo_method}_{args.data}.npz',
+                                        model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
                 # precision, recall, MAP, ndcg = compute_metrics(val_user_list, pred_list, topk=20)
                 print(f'Validation metric: {args.metric}, Value: {val_metric}')
                 validation_scores.append((iter + 1, val_metric))
@@ -635,7 +643,7 @@ def train(args, exp_id):
         #     f'results/{args.data}/performance/{exp_id}_validation.tsv', sep='\t',
         #     index=False)
         sampler.close()
-        return validation_scores
+        return validation_scores, val_best
     except KeyboardInterrupt:
         sampler.close()
         sys.exit()
@@ -738,6 +746,7 @@ if __name__ == '__main__':
     #     print("Arguments not saved!")
 
     print("Total number of experiments: ", len(experiments))
+    val_best = 0
     if config.end is None:
         config.end = len(experiments) + 1
     for i, experiment in enumerate(experiments, start=1):
@@ -764,7 +773,7 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
                 print("**** PARAMETERS NOT SAVED ****")
-            val_scores = train(args, exp_id)
+            val_scores, val_best = train(args, exp_id, val_best)
             store_validation[exp_id] = val_scores
             with open(f'results/{args.data}/performance/{head_id}_validation.pkl', 'wb') as f:
                 pickle.dump(store_validation, f)
