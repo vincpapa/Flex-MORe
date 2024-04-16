@@ -519,7 +519,7 @@ def preprocessing(settings):
     print("user_size:", user_size)
     print("item_size:", item_size)
 
-    if settings['data'] in ['ml-100k', 'ml-1m', 'lastfm', 'facebook_books', 'amazon_baby']:
+    if settings['data'] in ['ml-100k', 'ml-1m', 'lastfm', 'facebook_books', 'amazon_baby', 'amazon_music']:
         train_matrix, test_matrix, val_matrix, train_user_list, test_user_list, val_user_list\
             = sparse_matrix(train, test, val, user_size, item_size)
     # else:
