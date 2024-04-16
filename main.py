@@ -558,15 +558,16 @@ def train(args, exp_id, val_best):
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')
                 val_metric = compute_metrics(val_user_list, pred_list, args.metric)
-                if val_metric > val_best:
-                    val_best = val_metric
-                    if not os.path.exists(f'arrays/'):
-                        os.makedirs(f'arrays/')
-                    if not os.path.exists(f'arrays/{args.data}/'):
-                        os.makedirs(f'arrays/{args.data}/')
-                    #  np.savez_compressed(f'arrays/{args.data}/{exp_id}.npz', model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
-                    np.savez_compressed(f'arrays/{args.data}/{args.backbone}_{args.mo_method}_{args.data}.npz',
-                                        model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
+                if args.mo_method == 'None':
+                    if val_metric > val_best:
+                        val_best = val_metric
+                        if not os.path.exists(f'arrays/'):
+                            os.makedirs(f'arrays/')
+                        if not os.path.exists(f'arrays/{args.data}/'):
+                            os.makedirs(f'arrays/{args.data}/')
+                        #  np.savez_compressed(f'arrays/{args.data}/{exp_id}.npz', model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
+                        np.savez_compressed(f'arrays/{args.data}/{args.backbone}_{args.mo_method}_{args.data}.npz',
+                                            model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
                 # precision, recall, MAP, ndcg = compute_metrics(val_user_list, pred_list, topk=20)
                 print(f'Validation metric: {args.metric}, Value: {val_metric}')
                 validation_scores.append((iter + 1, val_metric))
@@ -659,7 +660,6 @@ def train(args, exp_id, val_best):
     #         f.write(f"{metric}@{str(k)}\t{str(it)}\t{str(max_met)}\n")
     # f.close()
 
-
     print('***** END EXPERIMENT *****')
 
 
@@ -726,15 +726,11 @@ if __name__ == '__main__':
     print("max_train_val_length:", max_length)
     if settings['data'] == 'ml-1m' or 'ml-100k':
         max_pos = max_length if max_length < 200 else 200
-    elif settings['data'] == 'facebook_books' or 'amazon_baby':
+    elif settings['data'] in ['facebook_books', 'amazon_baby', 'amazon_music']:
         max_pos = max_length if max_length < 200 else 200
     elif settings['data'] == 'lastfm':
         max_pos = max_length if max_length < 100 else 100
     print("max_pos:", max_pos)
-
-
-
-
 
     print("device:", settings['gpu_id'])
     print("Data name:", settings['data'])

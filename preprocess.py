@@ -151,6 +151,36 @@ class AmazonBaby(DatasetLoader):
 
         return df, train, test, val
 
+
+class AmazonMusic(DatasetLoader):
+    def __init__(self, data_dir):
+
+        self.fpath_train = os.path.join(data_dir, 'train.tsv')
+        self.fpath_test = os.path.join(data_dir, 'test.tsv')
+        self.fpath_val = os.path.join(data_dir, 'val.tsv')
+        self.fpath_user_act = os.path.join(data_dir, 'user_groups.tsv')
+
+    def load(self):
+        # Load data
+        train = pd.read_csv(self.fpath_train,
+                            sep='\t',
+                            names=['user', 'item', 'rate', 'timestamp'])
+        test = pd.read_csv(self.fpath_test,
+                            sep='\t',
+                            names=['user', 'item', 'rate', 'timestamp'])
+        val = pd.read_csv(self.fpath_val,
+                            sep='\t',
+                            names=['user', 'item', 'rate', 'timestamp'])
+        df = pd.concat([train[['user', 'item', 'rate']], val[['user', 'item', 'rate']], test[['user', 'item', 'rate']]], ignore_index=True)
+        act_user = pd.read_csv(self.fpath_user_act,
+                               sep='\t',
+                               names=['user', 'activity_level'])
+
+        df = pd.merge(df, act_user, on='user')
+
+        return df, train, test, val
+
+
 class FacebookBooks(DatasetLoader):
     def __init__(self, data_dir):
 
@@ -469,6 +499,8 @@ def preprocessing(settings):
         df, train, test, val = FacebookBooks(data_dir).load()
     elif settings['data'] == 'amazon_baby':
         df, train, test, val = AmazonBaby(data_dir).load()
+    elif settings['data'] == 'amazon_music':
+        df, train, test, val = AmazonMusic(data_dir).load()
     else:
         raise NotImplementedError
 
