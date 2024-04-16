@@ -46,7 +46,7 @@ def fairness_optimisation(fairness='N', uepsilon=0.000005, iepsilon = 0.0000005)
         model.objective = maximize(xsum((S[i][j] * W[i][j]) for i in V1 for j in V2) - uepsilon * (group_ndcg_v[1] - group_ndcg_v[0]) - iepsilon * (item_group[0] - item_group[1]))
 
     # first constraint: the number of 1 in W should be equal to top-k, recommending top-k best items
-    k = 20
+    k = 50
     for i in V1:
         model += xsum(W[i][j] for j in V2) == k
 
@@ -103,7 +103,7 @@ for dataset_name in dataset_list:
         ground_truth[i] = value
     shorthead_item_ids = set(short_head)
     longtail_item_ids = set(long_tail)
-    recs = glob('arrays/BPRMF/*.npz')
+    recs = glob(f'arrays/{dataset_name}/*.npz')
     U = np.zeros([int(dataset['user_size']), no_user_groups])
     for u in index_F:
         U[u][0] = 1
@@ -191,7 +191,7 @@ for dataset_name in dataset_list:
                                 for j in range(topk):
                                     R[uid][j] = W[uid][j].x
                             N_P = (P + 1) * R
-                            N_X = np.zeros([int(dataset['user_size']) * 20, 2])
+                            N_X = np.zeros([int(dataset['user_size']) * 50, 2])
                             j = 0
                             for u in range(N_P.shape[0]):
                                 for i in range(N_P.shape[1]):
@@ -205,15 +205,13 @@ for dataset_name in dataset_list:
                                 lambda x: conv_mapping(dataset['user_mapping'], x))
                             rec_elliot['item'] = rec_elliot['item'].map(
                                 lambda x: conv_mapping(dataset['item_mapping'], x))
-                            if not os.path.exists(f'recs/'):
-                                os.makedirs(f'recs/')
                             if 'BPRMF' in rec:
-                                # if not os.path.exists(f'recs/BPRMF'):
-                                #     os.makedirs(f'recs/BPRMF/')
-                                rec_elliot.to_csv(f'results/{dataset_name}/recs/BPRMF_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
+                                if not os.path.exists(f'results/{dataset_name}/best_recs/'):
+                                    os.makedirs(f'results/{dataset_name}/best_recs/')
+                                rec_elliot.to_csv(f'results/{dataset_name}/best_recs/BPRMF_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
                                                   sep='\t', index=False, header=False)
                             elif 'LightGCN' in rec:
-                                # if not os.path.exists(f'recs/LightGCN'):
-                                #     os.makedirs(f'recs/LightGCN/')
-                                rec_elliot.to_csv(f'results/{dataset_name}/recs/LightGCN_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
+                                if not os.path.exists(f'results/{dataset_name}/best_recs/'):
+                                    os.makedirs(f'results/{dataset_name}/best_recs/')
+                                rec_elliot.to_csv(f'results/{dataset_name}/best_recs/LightGCN_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
                                                   sep='\t', index=False, header=False)
