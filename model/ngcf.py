@@ -124,7 +124,8 @@ class NGCFModel(torch.nn.Module, ABC):
 
         i = i[:, dropout_mask]
         v = v[dropout_mask]
-
+        print(dropout_mask.shape)
+        print(noise_shape)
         out = SparseTensor(row=i[0],
                            col=i[1],
                            value=v * (1. / (1 - rate)),
