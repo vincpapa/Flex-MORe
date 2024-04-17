@@ -1,5 +1,5 @@
 setting:
-  data: amazon_baby # Dataset
+  data: facebook_books # Dataset
   gpu_id: 0 # GPU_ID
   baseline: NGCF # Base model
   wrapper: None # Multi-Objective Method
