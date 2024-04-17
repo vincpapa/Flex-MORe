@@ -121,7 +121,9 @@ class NGCFModel(torch.nn.Module, ABC):
         dropout_mask = torch.floor(random_tensor).type(torch.bool)
         i = self.adj.to_torch_sparse_coo_tensor().coalesce().indices()
         v = self.adj.to_torch_sparse_coo_tensor().coalesce().values()
-
+        print(dropout_mask.shape)
+        print(noise_shape)
+        print(i.shape)
         i = i[:, dropout_mask]
         v = v[dropout_mask]
         print(dropout_mask.shape)
