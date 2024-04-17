@@ -20,6 +20,14 @@ class Namespace:
             self.weight_decay = experiment['l_2']
             self.layers = experiment['layers']
             self.normalize = experiment['normalize']
+        elif self.backbone == 'NGCF':
+            self.dim = experiment['dim']
+            self.lr = experiment['lr']
+            self.weight_decay = experiment['l_2']
+            self.layers = experiment['layers']
+            self.message_dropout = experiment['message_dropout']
+            self.node_dropout = experiment['node_dropout']
+            self.normalize = experiment['normalize']
 
         if self.mo_method == 'PDU':
             self.atk = experiment['atk']

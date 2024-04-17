@@ -9,6 +9,7 @@ import time
 from argparse import ArgumentParser
 from model.mf import MatrixFactorization
 from model.lightgcn import LightGCNModel
+from model.ngcf import NGCFModel
 from SoftRank import SmoothDCGLoss, SmoothRank
 from sampler import NegSampler, negsamp_vectorized_bsearch_preverif
 from min_norm_solvers import MinNormSolver, gradient_normalizers
@@ -206,7 +207,10 @@ def train(args, exp_id, val_best):
         optimizer = torch.optim.Adam(model.myparameters, lr=args.lr, weight_decay=args.weight_decay)
     elif args.backbone == 'LightGCN':
         model = LightGCNModel(user_size, item_size, args, dataset['train_matrix'])
-        optimizer = torch.optim.Adam(model.myparameters, lr=args.lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    elif args.backbone == 'NGCF':
+        model = NGCFModel(user_size, item_size, args, dataset['train_matrix'])
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     else:
         print("Backbone not supported.")
         return -1
@@ -348,6 +352,8 @@ def train(args, exp_id, val_best):
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
                         scores_all = model.predict(users)
+                    elif args.backbone == 'NGCF':
+                        scores_all = model.predict(users)
                     ranks_prov = ranker(scores_all)
                     if 'm' in args.mode:
                         idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk)])
@@ -429,6 +435,8 @@ def train(args, exp_id, val_best):
                         if args.backbone == 'BPRMF':
                             scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                         elif args.backbone == 'LightGCN':
+                            scores_all = model.predict(users)
+                        elif args.backbone == 'NGCF':
                             scores_all = model.predict(users)
                         # scores_all[:,item_size] = -np.inf
                         scores = torch.gather(scores_all, 1, sampled_ids).to(args.device)
