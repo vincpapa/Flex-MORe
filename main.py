@@ -509,7 +509,7 @@ def train(args, exp_id, val_best):
                         loss_data[t] = loss_clone[t].item()
 
                         grads[t] = []
-                        for param in model.myparameters:
+                        for param in model.parameters():
                             if param.grad is not None:
                                 tmp = Variable(param.grad.data.clone(), requires_grad=False).to(args.device)
                                 tmp = tmp.flatten()
