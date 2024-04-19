@@ -178,6 +178,10 @@ for dataset_name in dataset_list:
                         elif 'LightGCN' in rec:
                             rec_elliot.to_csv(f'recs/LightGCN/LightGCN_PFAIR_{item_eps}_{dataset_name}.tsv',
                                               sep='\t', index=False, header=False)
+
+                        elif 'NGCF' in rec:
+                            rec_elliot.to_csv(f'recs/NGCF/NGCF_PFAIR_{item_eps}_{dataset_name}.tsv',
+                                              sep='\t', index=False, header=False)
                         # new_recs_string = rec.replace('None', f'PFAIR_{item_eps}').replace('npz', 'tsv')
                         # rec_elliot.to_csv(new_recs_string,
                         #                   sep='\t', index=False, header=False)
@@ -210,6 +214,13 @@ for dataset_name in dataset_list:
                                     os.makedirs(f'results/{dataset_name}/best_recs/')
                                 rec_elliot.to_csv(f'results/{dataset_name}/best_recs/BPRMF_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
                                                   sep='\t', index=False, header=False)
+
+                            elif 'NGCF' in rec:
+                                if not os.path.exists(f'results/{dataset_name}/best_recs/'):
+                                    os.makedirs(f'results/{dataset_name}/best_recs/')
+                                rec_elliot.to_csv(f'results/{dataset_name}/best_recs/NGCF_CPFAIR_{user_eps}_{item_eps}_{dataset_name}.tsv',
+                                                  sep='\t', index=False, header=False)
+
                             elif 'LightGCN' in rec:
                                 if not os.path.exists(f'results/{dataset_name}/best_recs/'):
                                     os.makedirs(f'results/{dataset_name}/best_recs/')
