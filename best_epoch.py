@@ -47,7 +47,7 @@ for dataset in datasets:
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
-        for k, v in store_validation.items():
+        for k, v in list(store_validation.items()):
             if '0$75' not in k:
                 del store_validation[k]
         for k, v in store_validation.items():
@@ -70,7 +70,7 @@ for dataset in datasets:
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
-        for k, v in store_validation.items():
+        for k, v in list(store_validation.items()):
             if '0$25' not in k:
                 del store_validation[k]
         for k, v in store_validation.items():
@@ -93,7 +93,7 @@ for dataset in datasets:
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
-        for k, v in store_validation.items():
+        for k, v in list(store_validation.items()):
             if '0$5' in k:
                 del store_validation[k]
         for k, v in store_validation.items():
