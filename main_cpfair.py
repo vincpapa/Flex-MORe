@@ -182,8 +182,8 @@ for dataset_name in dataset_list:
                         # rec_elliot.to_csv(new_recs_string,
                         #                   sep='\t', index=False, header=False)
                 elif fair_mode == 'CP':
-                    for user_eps in [0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
-                        for item_eps in [0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
+                    for user_eps in [0.005, 0.02, 0.04, 0.06, 0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
+                        for item_eps in [0.005, 0.02, 0.04, 0.06, 0.09]:  # [0.003, 0.0005, 0.0001, 0.00005, 0.000005]:
                             W, item_group = fairness_optimisation(fairness=fair_mode, uepsilon=user_eps, iepsilon=item_eps)
                             # W, item_group = fairness_optimisation(fairness=fair_mode, uepsilon=0, iepsilon=item_eps)
                             R = np.zeros([int(dataset['user_size']), topk])
