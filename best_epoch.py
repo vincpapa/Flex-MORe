@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_music']
+datasets = ['amazon_baby', 'facebook_books', 'amazon_music']
 for dataset in datasets:
     for file in glob.glob(f'results/{dataset}/performance/*None*'):
         with open(file, 'rb') as handle:
