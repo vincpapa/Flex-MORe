@@ -3,7 +3,7 @@ import glob
 import shutil
 import os
 
-datasets = ['facebook_books', 'amazon_baby', 'ml-1m']
+datasets = ['facebook_books', 'amazon_baby', 'amazon_music']
 for dataset in datasets:
     for file in glob.glob(f'results/{dataset}/performance/*None*'):
         with open(file, 'rb') as handle:
