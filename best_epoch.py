@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['facebook_books', 'amazon_baby', 'amazon_music']
+datasets = ['amazon_music']
 for dataset in datasets:
     for file in glob.glob(f'results/{dataset}/performance/*None*'):
         with open(file, 'rb') as handle:
@@ -45,6 +45,7 @@ for dataset in datasets:
         shutil.copyfile(loss, dst_loss)
 
     for file in glob.glob(f'results/{dataset}/performance/*PDU*'):
+        print('FOUND PDU')
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
