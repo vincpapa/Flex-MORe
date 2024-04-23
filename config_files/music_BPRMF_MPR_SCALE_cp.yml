@@ -1,6 +1,6 @@
 setting:
   data: amazon_music # Dataset
-  gpu_id: 1 # GPU_ID
+  gpu_id: 0 # GPU_ID
   baseline: BPRMF # Base model
   wrapper: PDU_SCALE # Multi-Objective Method
   epochs: 500 # Number of epochs
@@ -15,7 +15,7 @@ hyperparameters:
   g_n: [loss+] # Modality of gradient normalization
   atk: [20] # Cutoff when computing approximated metrics
   ranker: [AIMLE]
-  scale: [0.9]
+  scale: [0.5]
 
 
 
