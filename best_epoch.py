@@ -76,6 +76,7 @@ for dataset in datasets:
             if '0$25' not in k:
                 del store_validation[k]
         for k, v in store_validation.items():
+            print('FOUND PDU 0.25')
             store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
         if store_validation != {}:
             maximumValue = max(store_validation.values(), key=lambda k: k[1])
