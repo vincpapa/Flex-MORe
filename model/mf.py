@@ -18,6 +18,7 @@ class MatrixFactorization(nn.Module):
 
         self.num_users = num_users
         self.num_items = num_items
+        self.l_w = args.weight_decay
         random_seed = 42
         random.seed(random_seed)
         np.random.seed(random_seed)
@@ -52,8 +53,12 @@ class MatrixFactorization(nn.Module):
 
         maxi = nn.LogSigmoid()(tmp)
         bpr_loss = -torch.sum(maxi)
+        reg_loss = self.l_w * (1 / 2) * (torch.norm(user_emb) ** 2
+                                         + torch.norm(pos_emb) ** 2
+                                         + torch.norm(neg_emb) ** 2) / self.num_users
 
-        return bpr_loss
+        return bpr_loss + reg_loss
+        # return bpr_loss
 
     def predict(self, user_id):
         # user_id = Variable(torch.from_numpy(user_id).long(), requires_grad=False).to(self.device)

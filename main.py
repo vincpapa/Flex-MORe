@@ -204,7 +204,8 @@ def train(args, exp_id, val_best):
 
     if args.backbone == 'BPRMF':
         model = MatrixFactorization(user_size, item_size, args)
-        optimizer = torch.optim.Adam(model.myparameters, lr=args.lr, weight_decay=args.weight_decay)
+        # optimizer = torch.optim.Adam(model.myparameters, lr=args.lr, weight_decay=args.weight_decay)
+        optimizer = torch.optim.Adam(model.myparameters, lr=args.lr)  # , weight_decay=args.weight_decay)
     elif args.backbone == 'LightGCN':
         model = LightGCNModel(user_size, item_size, args, dataset['train_matrix'])
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
