@@ -4,8 +4,8 @@ import shutil
 import os
 
 
-datasets = ['amazon_baby']
-backbone = 'BPRMF'
+datasets = ['amazon_music']
+backbone = 'NGCF'
 for dataset in datasets:
     for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
         with open(file, 'rb') as handle:
