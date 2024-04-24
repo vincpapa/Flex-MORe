@@ -5,8 +5,9 @@ import os
 
 
 datasets = ['amazon_baby']
+backbone = 'BPRMF'
 for dataset in datasets:
-    for file in glob.glob(f'results/{dataset}/performance/*NGCF*None*'):
+    for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -25,7 +26,7 @@ for dataset in datasets:
         dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
         shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*NGCF*multifr*'):
+    for file in glob.glob(f'results/{dataset}/performance/*{backbone}*multifr*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -44,7 +45,7 @@ for dataset in datasets:
         dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
         shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*NGCF*PDU*rpms*'):
+    for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
         print('FOUND PDU')
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
@@ -68,7 +69,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*NGCF*PDU*rpms*'):
+    for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -92,7 +93,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*NGCF*PDU*rpms*'):
+    for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -116,7 +117,7 @@ for dataset in datasets:
             shutil.copyfile(loss, dst_loss)
 
     if False:
-        for file in glob.glob(f'results/{dataset}/performance/*NGCF*PDU*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
