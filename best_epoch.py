@@ -44,7 +44,7 @@ for dataset in datasets:
         dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
         shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*PDU*'):
+    for file in glob.glob(f'results/{dataset}/performance/*PDU*rpms*'):
         print('FOUND PDU')
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
@@ -68,7 +68,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*PDU*'):
+    for file in glob.glob(f'results/{dataset}/performance/*PDU*rpms*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -92,7 +92,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*PDU*'):
+    for file in glob.glob(f'results/{dataset}/performance/*PDU*rpms*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
@@ -115,7 +115,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    for file in glob.glob(f'results/{dataset}/performance/*PDU*'):
+    for file in glob.glob(f'results/{dataset}/performance/*PDU*rpms*'):
         with open(file, 'rb') as handle:
             store_validation = pickle.load(handle)
 
