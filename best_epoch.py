@@ -6,7 +6,7 @@ import os
 
 datasets = ['amazon_music']
 backbone = 'BPRMF'
-method = 'multifr'
+method = 'PDU'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
