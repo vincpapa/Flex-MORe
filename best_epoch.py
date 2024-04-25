@@ -125,7 +125,8 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if False:
+    if method == 'PDU':
+
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
