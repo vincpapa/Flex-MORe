@@ -5,7 +5,7 @@ import os
 
 
 datasets = ['amazon_music']
-backbone = 'BPRMF'
+backbone = 'NGCF'
 method = 'PDU'
 for dataset in datasets:
     if method == 'None':
@@ -127,7 +127,7 @@ for dataset in datasets:
 
     if method == 'PDU':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*PDU*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
