@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_baby']
+datasets = ['amazon_music']
 backbone = 'BPRMF'
 method = 'PDU'
 for dataset in datasets:
