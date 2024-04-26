@@ -4,8 +4,8 @@ import shutil
 import os
 
 
-datasets = ['amazon_music']
-backbone = 'NGCF'
+datasets = ['amazon_baby']
+backbone = 'BPRMF'
 method = 'PDU'
 for dataset in datasets:
     if method == 'None':
