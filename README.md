@@ -1,5 +1,5 @@
 # Multi-Objective Personalized Ranking for Recommendation
-This repository contains the source codes and datasets of the paper _Multi-objective Personalized Ranking for Recommendation_ submitted at SIGIR 2024.
+This repository contains the source codes and datasets of the paper _Multi-objective Personalized Ranking for Recommendation_ submitted at RecSys 2024.
 
 ### Requirements
 We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `LightGCN` moodel require `PyTorch Geometric`. Then, the requirements listed in the `req_MPR.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
