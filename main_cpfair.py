@@ -110,6 +110,7 @@ for dataset_name in dataset_list:
     for u in index_M:
         U[u][1] = 1
     # U[:, 1] = 1
+
     for rec in recs:
         if dataset_name in rec:
             # df = pd.read_csv(rec, sep='\t', names=['user', 'item', 'rate'])
