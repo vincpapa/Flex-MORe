@@ -28,3 +28,21 @@ In the following, we explain how to run the models within the paper.
 
 ### Evaluation
 To evaluate the models, we relied on the public and open-source framework Elliot. Here, given a pre-obtained recommendation list by running the models as explained above, you can compute the metrics discussed within the paper. Please, refer to Elliot official [documentation](https://elliot.readthedocs.io/en/latest/) for further details on how compute the metrics. We add an example of configuration file in the `config_files` folder within the compressed file.
+
+
+### Additional Results
+- AMAZON BABY
+
+|                | **nDCG** | **Recall** | **Gini** | **IC** | **APLT** | **RSP** | **MAD** | **PDU** |
+|----------------|----------|------------|----------|--------|----------|---------|---------|---------|
+| BPRMF-MPR      | 0.1640   | 0.2040     | 0.2686   | 7466   | 0.1833   | 0.7009  | 0.0418  | 9.0778  |
+| BPRMF-MultiFR  | 0.1665   | 0.2185     | 0.1017   | 5065   | 0.0486   | 0.9230  | 0.0396  | 9.2047  |
+| BPRMF-CPFair   | 0.1628   | 0.2013     | 0.2447   | 7060   | 0.1681   | 0.7266  | 0.0383  | 9.0959  |
+
+
+|              | **nDCG** | **Recall** | **Gini** | **IC** | **APLT** | **RSP** | **MAD** | **PDU** |
+|--------------|----------|------------|----------|--------|----------|---------|---------|---------|
+| NGCF-MPR     | 0.1239   | 0.1666     | 0.4017   | 7817   | 0.4460   | 0.2280  | 0.0509  | 8.8381  |
+| NGCF-MultiFR | 0.0092   | 0.0151     | 0.5707   | 7755   | 0.4636   | 0.1953  | 0.0090  | 8.9308  |
+| NGCF-CPFair  | 0.1408   | 0.1845     | 0.2845   | 7254   | 0.1919   | 0.6840  | 0.0503  | 9.0890  |
+
