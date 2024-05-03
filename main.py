@@ -239,7 +239,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['PDU', 'PDU_SCALE']:
+    if args.mo_method in ['MPR', 'MPR_SCALE']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -348,7 +348,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['PDU', 'PDU_SCALE']:
+                if args.mo_method in ['MPR', 'MPR_SCALE']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -493,7 +493,7 @@ def train(args, exp_id, val_best):
                         loss['3'] = torch.tensor(0)
 
                 # Use MOOP or not
-                if args.mo_method in ['PDU', 'multifr']:
+                if args.mo_method in ['MPR', 'multifr']:
                     # Copy the loss data. Average loss1 for calculating scale
                     for k in loss:
                         if k == '1':
@@ -542,7 +542,7 @@ def train(args, exp_id, val_best):
                 batch_loss.backward()
                 optimizer.step()
 
-            # if args.mo_method == 'PDU':
+            # if args.mo_method == 'MPR':
             #     print(f"\nAPLT loss:\t{acc / num_batches} (the lower the better, [0,1])")
             #     print(f"Approx nDCG loss:\t{acc_ndcg / num_batches} (the lower the better, [0,1])")
 
