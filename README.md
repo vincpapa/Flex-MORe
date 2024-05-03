@@ -2,7 +2,7 @@
 This repository contains the source codes and datasets of the paper _Multi-objective Personalized Ranking for Recommendation_ submitted at RecSys 2024.
 
 ### Requirements
-We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `LightGCN` moodel require `PyTorch Geometric`. Then, the requirements listed in the `req_MPR.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
+We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `NGCF` moodel require `PyTorch Geometric`. Then, the requirements listed in the `req_MPR.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
 
 ```
 $ python3 -m venv venv
@@ -24,6 +24,7 @@ In the following, we explain how to run the models within the paper.
   ```
   $ python3 -u main_cpfair.py
   ```
+  Please, note that to execute this baseline, you need to install the Gurobi package on your machine.
 
 ### Evaluation
 To evaluate the models, we relied on the public and open-source framework Elliot. Here, given a pre-obtained recommendation list by running the models as explained above, you can compute the metrics discussed within the paper. Please, refer to Elliot official [documentation](https://elliot.readthedocs.io/en/latest/) for further details on how compute the metrics. We add an example of configuration file in the `config_files` folder within the compressed file.
