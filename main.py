@@ -426,7 +426,7 @@ def train(args, exp_id, val_best):
                     else:
                         loss['3'] = torch.tensor(0)
                     if 's' in args.mode:
-                        loss['4'] = torch.log(1 + loss['2'] + loss['3'])
+                        loss['4'] = torch.log(1 + loss['2'] + loss['3']) / len(unique_u)
                         loss['2'] = torch.tensor(0)
                         loss['3'] = torch.tensor(0)
 
