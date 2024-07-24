@@ -28,6 +28,8 @@ import math
 import pickle
 from imle.aimle import aimle
 from imle.target import AdaptiveTargetDistribution, TargetDistribution
+from torch.nn import Sigmoid
+
 
 def rank(seq: Tensor) -> Tensor:
     res = torch.argsort(torch.argsort(seq, dim=1, descending=True)) + 1
@@ -37,6 +39,7 @@ def rank(seq: Tensor) -> Tensor:
 target_distribution = AdaptiveTargetDistribution(beta_update_step=1e-2)
 # Implicit MLE (https://arxiv.org/abs/2106.01798, NeurIPS 2021)
 # target_distribution = TargetDistribution(alpha=1.0, beta=100.0)
+
 
 @aimle(target_distribution=target_distribution)
 def differentiable_ranker(weights_batch: Tensor) -> Tensor:
@@ -188,6 +191,20 @@ def exp_string(i, args):
 def exp_setting(i, setting):
     return '-'.join(f'{key}={value}' for key, value in vars(setting).items()
                     if key in ['backbone', 'mo_method', 'mode', 'data'])
+
+
+def normalize_loss(data):
+    sigmoid = Sigmoid()
+    mean = torch.mean(data)
+    # print(mean)
+    std_dev = torch.std(data)
+    # print(std_dev)
+    z_scores = (data - mean) / std_dev
+    z_scores = sigmoid(z_scores)
+    # utopia_point = 0
+    # norm_utopia_point = (utopia_point -mean)/std_dev
+    # print(norm_utopia_point)
+    return z_scores  # , (norm_utopia_point-z_scores)
 
 
 def train(args, exp_id, val_best):
@@ -374,7 +391,9 @@ def train(args, exp_id, val_best):
                         # scores = torch.gather(scores_all, 1, sampled_ids).to(args.device)
                         # ndcg = dcg_loss(scores[unique_u], scores_all[unique_u], labels[unique_u])
                         # del scores
-                        loss['2'] = (torch.square(1 - ndcg)).sum()
+
+                        # loss['2'] = (torch.square(1 - ndcg)).sum()
+                        loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
                         # acc_ndcg = acc_ndcg + loss['2']/len(unique_u)
                         # del ndcg
                     else:
@@ -418,7 +437,7 @@ def train(args, exp_id, val_best):
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                     loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
                                 else:
-                                    loss['3'] = (torch.square(1 - ranks_prov)).sum()
+                                    loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
                                 # loss['3'] = loss['3'] + ranks_prov
                                 # acc = acc + ranks_prov/len(unique_u)
                             del ranks_prov
@@ -426,7 +445,8 @@ def train(args, exp_id, val_best):
                     else:
                         loss['3'] = torch.tensor(0)
                     if 's' in args.mode:
-                        loss['4'] = torch.log(1 + loss['2'] + loss['3']) / len(unique_u)
+                        # loss['4'] = torch.log(1 + loss['2'] + loss['3']) / len(unique_u)
+                        loss['4'] = (loss['2'] + loss['3']) / len(unique_u)
                         loss['2'] = torch.tensor(0)
                         loss['3'] = torch.tensor(0)
 
