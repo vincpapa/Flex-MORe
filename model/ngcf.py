@@ -147,14 +147,14 @@ class NGCFModel(torch.nn.Module, ABC):
         xu_pos, gamma_u, gamma_i_pos = self.compute_xui(inputs=(gu[user], gi[pos]))
         xu_neg, _, gamma_i_neg = self.compute_xui(inputs=(gu[user], gi[neg]))
         maxi = torch.nn.LogSigmoid()(xu_pos - xu_neg)
-        mf_loss = -1 * torch.mean(maxi)
-        # mf_loss = -1 * torch.sum(maxi)
-        reg_loss = self.l_w * (1 / 2) * (torch.norm(gu[user]) ** 2
-                                         + torch.norm(gi[pos]) ** 2
-                                         + torch.norm(gi[neg]) ** 2) / len(user)
+        # mf_loss = -1 * torch.mean(maxi)
+        mf_loss = -1 * torch.sum(maxi)
         # reg_loss = self.l_w * (1 / 2) * (torch.norm(gu[user]) ** 2
         #                                  + torch.norm(gi[pos]) ** 2
-        #                                  + torch.norm(gi[neg]) ** 2)  # / len(user)
+        #                                  + torch.norm(gi[neg]) ** 2) / len(user)
+        reg_loss = self.l_w * (1 / 2) * (torch.norm(gu[user]) ** 2
+                                         + torch.norm(gi[pos]) ** 2
+                                         + torch.norm(gi[neg]) ** 2)  # / len(user)
         mf_loss += reg_loss
 
         # self.optimizer.zero_grad()
