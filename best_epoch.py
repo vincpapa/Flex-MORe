@@ -5,7 +5,7 @@ import os
 
 
 datasets = ['facebook_books']
-backbone = 'BPRMF'
+backbone = 'NGCF'
 method = 'MPR'
 for dataset in datasets:
     if method == 'None':
