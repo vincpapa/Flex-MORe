@@ -6,7 +6,7 @@ import os
 
 datasets = ['facebook_books']
 backbone = 'NGCF'
-method = 'MPR'
+method = 'multifr'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
