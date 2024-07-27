@@ -5,7 +5,7 @@ import os
 
 
 datasets = ['amazon_baby']
-backbone = 'NGCF'
+backbone = 'BPRMF'
 method = 'MPR'
 for dataset in datasets:
     if method == 'None':
