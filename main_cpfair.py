@@ -90,7 +90,7 @@ def to_mapping(mapping, x):
 
 
 # dataset_list = ['amazon_baby', 'facebook_books', 'amazon_music']
-dataset_list = ['facebook_books']
+dataset_list = ['amazon_baby']
 for dataset_name in dataset_list:
     settings = {'data': dataset_name}
     dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(settings)
@@ -113,7 +113,7 @@ for dataset_name in dataset_list:
     # U[:, 1] = 1
 
     for rec in recs:
-        if dataset_name in rec:
+        if dataset_name in rec and 'BPRMF' in rec:
             # df = pd.read_csv(rec, sep='\t', names=['user', 'item', 'rate'])
             # df['user'] = df['user'].map(lambda x: to_mapping(dataset['user_mapping'], x))
             # df['item'] = df['item'].map(lambda x: to_mapping(dataset['item_mapping'], x))
