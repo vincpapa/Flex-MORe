@@ -90,7 +90,7 @@ def to_mapping(mapping, x):
 
 
 # dataset_list = ['amazon_baby', 'facebook_books', 'amazon_music']
-dataset_list = ['amazon_baby']
+dataset_list = ['amazon_music']
 for dataset_name in dataset_list:
     settings = {'data': dataset_name}
     dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(settings)
