@@ -4,9 +4,9 @@ import shutil
 import os
 
 
-datasets = ['amazon_baby']
+datasets = ['amazon_music']
 backbone = 'BPRMF'
-method = 'MPR'
+method = 'None'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
