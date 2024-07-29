@@ -755,9 +755,9 @@ if __name__ == '__main__':
     print("max_train_val_length:", max_length)
     if settings['data'] == 'ml-1m' or 'ml-100k':
         max_pos = max_length if max_length < 200 else 200
-    elif settings['data'] in ['facebook_books', 'amazon_baby', 'amazon_music']:
+    elif settings['data'] in ['facebook_books', 'amazon_baby']: # , 'amazon_music']:
         max_pos = max_length if max_length < 200 else 200
-    elif settings['data'] == 'lastfm':
+    elif settings['data'] == 'amazon_music':
         max_pos = max_length if max_length < 100 else 100
     print("max_pos:", max_pos)
 
