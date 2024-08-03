@@ -52,14 +52,14 @@ class MatrixFactorization(nn.Module):
         tmp = pos_scores - neg_scores
 
         maxi = nn.LogSigmoid()(tmp)
-        bpr_loss = -torch.sum(maxi)
-        # bpr_loss = -torch.mean(maxi)
-        reg_loss = self.l_w * (torch.norm(user_emb) ** 2
-                               + torch.norm(pos_emb) ** 2
-                               + torch.norm(neg_emb) ** 2)  # / len(user_emb)
+        # bpr_loss = -torch.sum(maxi)
+        bpr_loss = -torch.mean(maxi)
         # reg_loss = self.l_w * (torch.norm(user_emb) ** 2
         #                        + torch.norm(pos_emb) ** 2
-        #                        + torch.norm(neg_emb) ** 2) / len(user_emb)
+        #                        + torch.norm(neg_emb) ** 2)  # / len(user_emb)
+        reg_loss = self.l_w * (torch.norm(user_emb) ** 2
+                               + torch.norm(pos_emb) ** 2
+                               + torch.norm(neg_emb) ** 2) / len(user_emb)
 
         return bpr_loss + reg_loss
         # return bpr_loss
