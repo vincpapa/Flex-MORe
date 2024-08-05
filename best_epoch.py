@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_music']
+datasets = ['amazon_boysgirls']
 backbone = 'NGCF'
 method = 'multifr'
 for dataset in datasets:
