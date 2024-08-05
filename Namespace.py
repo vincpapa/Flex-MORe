@@ -42,7 +42,7 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
-        elif self.mo_method == 'MPR_SCALE':
+        elif self.mo_method == 'MPR_SCALE' or self.mo_method == 'MPR_ABL':
             self.atk = experiment['atk']
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
