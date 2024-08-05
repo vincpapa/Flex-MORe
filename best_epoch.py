@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_boys_girls']
+datasets = ['facebook_books']
 backbone = 'BPRMF'
 method = 'MPR'
 for dataset in datasets:
