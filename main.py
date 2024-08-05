@@ -256,7 +256,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['MPR', 'MPR_SCALE']:
+    if args.mo_method in ['MPR', 'MPR_SCALE', 'MPR_ABL']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -365,7 +365,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['MPR', 'MPR_SCALE']:
+                if args.mo_method in ['MPR', 'MPR_SCALE', 'MPR_ABL']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -393,7 +393,10 @@ def train(args, exp_id, val_best):
                         # del scores
 
                         # loss['2'] = (torch.square(1 - ndcg)).sum()
-                        loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
+                        if args.mo_method in ['MPR', 'MPR_SCALE']:
+                            loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
+                        else:
+                            loss['2'] = torch.square(1 - ndcg).sum()
                         # acc_ndcg = acc_ndcg + loss['2']/len(unique_u)
                         # del ndcg
                     else:
@@ -437,7 +440,11 @@ def train(args, exp_id, val_best):
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                     loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
                                 else:
-                                    loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
+                                    if args.mo_method in ['MPR', 'MPR_SCALE']:
+                                        loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
+                                    else:
+                                        loss['3'] = torch.square(1 - ranks_prov).sum()
+
                                 # loss['3'] = loss['3'] + ranks_prov
                                 # acc = acc + ranks_prov/len(unique_u)
                             del ranks_prov
