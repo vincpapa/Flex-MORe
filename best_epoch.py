@@ -6,7 +6,7 @@ import os
 
 datasets = ['amazon_boys_girls']
 backbone = 'NGCF'
-method = 'MPR'
+method = 'None'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
