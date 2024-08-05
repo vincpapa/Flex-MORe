@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['facebook_books']
+datasets = ['amazon_baby']
 backbone = 'NGCF'
 method = 'MPR'
 for dataset in datasets:

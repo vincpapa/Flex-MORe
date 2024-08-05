@@ -20,6 +20,3 @@ hyperparameters:
   node_dropout: [0.1]
   normalize: [True]
   scale: [0.75]
-
-
-
