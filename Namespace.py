@@ -29,7 +29,7 @@ class Namespace:
             self.node_dropout = experiment['node_dropout']
             self.normalize = experiment['normalize']
 
-        if self.mo_method == 'MPR':
+        if self.mo_method == 'FLEXMORE':
             self.atk = experiment['atk']
             self.type = experiment['g_n']
             self.ranker = experiment['ranker']
@@ -42,7 +42,7 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
-        elif self.mo_method == 'MPR_SCALE' or self.mo_method == 'MPR_ABL':
+        elif self.mo_method == 'FLEXMORE_SCALE' or self.mo_method == 'FLEXMORE_ABL':
             self.atk = experiment['atk']
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']

@@ -6,7 +6,7 @@ import os
 
 datasets = ['amazon_baby']
 backbone = 'BPRMF'
-method = 'MPR'
+method = 'FLEXMORE'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
@@ -48,7 +48,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    if method == 'MPR':
+    if method == 'FLEXMORE':
 
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
             with open(file, 'rb') as handle:
@@ -73,10 +73,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'MPR':
+    if method == 'FLEXMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*MPR*rpms*'):
-            print('FOUND MPR')
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -99,9 +98,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'MPR':
+    if method == 'FLEXMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*MPR*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -109,7 +108,6 @@ for dataset in datasets:
                 if '0$25' not in k:
                     del store_validation[k]
             for k, v in store_validation.items():
-                print('FOUND MPR 0.25')
                 store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
             if store_validation != {}:
                 maximumValue = max(store_validation.values(), key=lambda k: k[1])
@@ -125,9 +123,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'MPR':
+    if method == 'FLEXMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*MPR*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -150,7 +148,7 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'MPR':
+    if method == 'FLEXMORE':
 
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
             with open(file, 'rb') as handle:

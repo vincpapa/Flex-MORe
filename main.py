@@ -256,7 +256,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['MPR', 'MPR_SCALE', 'MPR_ABL']:
+    if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -365,7 +365,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['MPR', 'MPR_SCALE', 'MPR_ABL']:
+                if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -393,7 +393,7 @@ def train(args, exp_id, val_best):
                         # del scores
 
                         # loss['2'] = (torch.square(1 - ndcg)).sum()
-                        if args.mo_method in ['MPR', 'MPR_SCALE']:
+                        if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
                         else:
                             loss['2'] = torch.square(1 - ndcg).sum()
@@ -440,7 +440,7 @@ def train(args, exp_id, val_best):
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                     loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
                                 else:
-                                    if args.mo_method in ['MPR', 'MPR_SCALE']:
+                                    if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE']:
                                         loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
                                     else:
                                         loss['3'] = torch.square(1 - ranks_prov).sum()
@@ -520,7 +520,7 @@ def train(args, exp_id, val_best):
                         loss['3'] = torch.tensor(0)
 
                 # Use MOOP or not
-                if args.mo_method in ['MPR', 'multifr']:
+                if args.mo_method in ['FLEXMORE', 'multifr']:
                     # Copy the loss data. Average loss1 for calculating scale
                     for k in loss:
                         if k == '1':
@@ -569,7 +569,7 @@ def train(args, exp_id, val_best):
                 batch_loss.backward()
                 optimizer.step()
 
-            # if args.mo_method == 'MPR':
+            # if args.mo_method == 'FLEXMORE':
             #     print(f"\nAPLT loss:\t{acc / num_batches} (the lower the better, [0,1])")
             #     print(f"Approx nDCG loss:\t{acc_ndcg / num_batches} (the lower the better, [0,1])")
 
