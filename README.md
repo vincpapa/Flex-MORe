@@ -1,14 +1,14 @@
-# Multi-Objective Personalized Ranking for Recommendation
-This repository contains the source codes and datasets of the paper _Multi-objective Personalized Ranking for Recommendation_ submitted at RecSys 2024.
+# Flex-MORe: A Flexible Multi-Objective Recommendation Framework
+This repository contains the source codes and datasets of the paper _Flex-MORe: A Flexible Multi-Objective Recommendation Framework_ submitted at WSDM 2024.
 
 ### Requirements
-We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `NGCF` moodel require `PyTorch Geometric`. Then, the requirements listed in the `req_MPR.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
+We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `NGCF` model require `PyTorch Geometric`. Then, the requirements listed in the `requirements.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
 
 ```
 $ python3 -m venv venv
 $ source venv/bin/activate
 $ pip install --upgrade pip
-$ pip install -r req_MPR.txt
+$ pip install -r requirements.txt
 ```
 
 ### Data
