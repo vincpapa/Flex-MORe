@@ -456,6 +456,9 @@ def train(args, exp_id, val_best):
                         loss['4'] = (loss['2'] + loss['3']) / len(unique_u)
                         loss['2'] = torch.tensor(0)
                         loss['3'] = torch.tensor(0)
+                    else:
+                        loss['2'] = loss['2'] / len(unique_u)
+                        loss['3'] = loss['3'] / len(unique_u)
 
                 # MultiFR Method
                 elif args.mo_method == 'multifr':
