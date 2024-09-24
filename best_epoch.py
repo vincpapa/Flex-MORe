@@ -175,7 +175,7 @@ for dataset in datasets:
 
     if method == 'FLEXMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpm-*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpm_*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
