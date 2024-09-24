@@ -4,8 +4,8 @@ import shutil
 import os
 
 
-datasets = ['amazon_music', 'facebook_books']
-backbone = 'NGCF'
+datasets = ['amazon_baby', 'amazon_music', 'facebook_books']
+backbone = 'BPRMF'
 method = 'FLEXMORE'
 for dataset in datasets:
     if method == 'None':
