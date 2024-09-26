@@ -374,8 +374,8 @@ def train(args, exp_id, val_best):
                         scores_all = model.predict(users)
                     ranks_prov = ranker(scores_all)
                     if 'm' in args.mode:
-                        idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk)])
-                        dcg_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + args.atk) + 1) / 2) * labels[unique_u]
+                        idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk_con)])
+                        dcg_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + args.atk_con) + 1) / 2) * labels[unique_u]
                         # dcg = dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1)
                         dcg = torch.sum(dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1), dim=-1)
                         ndcg = dcg / idcg
@@ -413,18 +413,18 @@ def train(args, exp_id, val_best):
                             elif args.ablation == 'all':
                                 ranks_prov = ranker.forward(scores_tail[unique_u], scores_all[unique_u])
                             ranks_prov = ranks_prov[unique_u]
-                            ranks_prov = (torch.tanh(-ranks_prov + args.atk) + 1) / 2
+                            ranks_prov = (torch.tanh(-ranks_prov + args.atk_pro) + 1) / 2
                             ranks_prov = torch.sum(ranks_prov, dim=1)
-                            ranks_prov = torch.clamp(ranks_prov, min=0, max=args.atk) / args.atk
+                            ranks_prov = torch.clamp(ranks_prov, min=0, max=args.atk_pro) / args.atk_pro
                             loss['3'] = (torch.square(1 - ranks_prov)).sum()
                             # loss['3'] = loss['3'] + ranks_prov
                             # acc = acc + ranks_prov/len(unique_u)
                             del ranks_prov
                         else:
                             if 'd' in args.mode:
-                                raplt_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_tail_ids[unique_u]) + args.atk) + 1) / 2) * labels_tail[unique_u]
+                                raplt_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_tail_ids[unique_u]) + args.atk_pro) + 1) / 2) * labels_tail[unique_u]
                                 raplt_num = torch.sum(raplt_num, dim=-1) # raplt_num / args.atk
-                                raplt = raplt_num / args.atk
+                                raplt = raplt_num / args.atk_pro
                                 # for el in unique_u:
                                 #     raplt.append(torch.sum((torch.tanh(
                                 #         -ranks_prov[el][train_user_tail_list[el]] + args.atk) + 1) / 2) / args.atk)
@@ -433,8 +433,8 @@ def train(args, exp_id, val_best):
                                 loss['3'] = (torch.square(user_aplt - raplt)).sum()
                             else:
                                 ranks_prov = ranks_prov[unique_u]
-                                ranks_prov = (torch.tanh(-ranks_prov + args.atk) + 1) / 2
-                                ranks_prov = torch.sum(ranks_prov[:, long_tail], dim=1) / args.atk
+                                ranks_prov = (torch.tanh(-ranks_prov + args.atk_pro) + 1) / 2
+                                ranks_prov = torch.sum(ranks_prov[:, long_tail], dim=1) / args.atk_pro
                                 # ranks_prov = torch.clamp(ranks_prov, min=0, max=args.atk) / args.atk
                                 if 'c' in args.mode:
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
@@ -714,7 +714,7 @@ if __name__ == '__main__':
     config = parse_args()
     config.config = 'config_files/' + config.config
     with open(config.config, 'r') as file:
-        conf = yaml.safe_load(file)
+        conf = yaml.load(file, Loader=yaml.FullLoader)
     settings = conf['setting']
     keys, values = zip(*conf['hyperparameters'].items())
     experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]

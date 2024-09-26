@@ -43,7 +43,14 @@ class Namespace:
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
         elif self.mo_method == 'FLEXMORE_SCALE' or self.mo_method == 'FLEXMORE_ABL':
-            self.atk = experiment['atk']
+            try:
+                self.atk_con = experiment['atk']['atk_cons']
+            except KeyError:
+                pass
+            try:
+                self.atk_pro = experiment['atk']['atk_prov']
+            except KeyError:
+                pass
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
 
