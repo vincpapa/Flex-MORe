@@ -177,10 +177,8 @@ def rec_to_elliot(iter, top200_id, dataset, exp_string):
     rec_elliot['item'] = rec_elliot['item'].map(lambda x: conv_mapping(dataset['item_mapping'], x))
     if not os.path.exists(f'results/{args.data}/recs'):
         os.makedirs(f'results/{args.data}/recs')
-    try:
-        rec_elliot.to_csv(f'results/{args.data}/recs/{exp_string}_it={iter}_recs.tsv',
+    rec_elliot.to_csv(f'results/{args.data}/recs/{exp_string}_it={iter}_recs.tsv',
                                         sep='\t', index=False, header=False)
-    except OSError:
 
 
 
