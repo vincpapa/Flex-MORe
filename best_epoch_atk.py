@@ -12,9 +12,12 @@ for dataset in datasets:
 
         if method == 'FLEXMORE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*atk_con=10-atk_pro=20*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
+                for k, v in list(store_validation.items()):
+                    if 'atk_con=10-atk_pro=20' not in k:
+                        del store_validation[k]
                 for k, v in store_validation.items():
                     store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
                 if store_validation != {}:
@@ -33,9 +36,11 @@ for dataset in datasets:
 
         if method == 'FLEXMORE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*atk_con=20-atk_pro=10*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
+                if 'atk_con=20-atk_pro=10' not in k:
+                    del store_validation[k]
                 for k, v in store_validation.items():
                     store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
                 if store_validation != {}:
@@ -54,9 +59,11 @@ for dataset in datasets:
 
         if method == 'FLEXMORE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*atk_con=30-atk_pro=10*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
+                if 'atk_con=30-atk_pro=10' not in k:
+                    del store_validation[k]
                 for k, v in store_validation.items():
                     store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
                 if store_validation != {}:
@@ -75,9 +82,11 @@ for dataset in datasets:
 
         if method == 'FLEXMORE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*atk_con=10-atk_pro=30*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
+                if 'atk_con=10-atk_pro=30' not in k:
+                    del store_validation[k]
                 for k, v in store_validation.items():
                     store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
                 if store_validation != {}:
