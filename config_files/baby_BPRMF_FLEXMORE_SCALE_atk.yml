@@ -15,7 +15,7 @@ hyperparameters:
   g_n: [loss+] # Modality of gradient normalization
   atk: [{atk_cons: 20, atk_prov: 10}, {atk_cons: 20, atk_prov: 30}] # [{atk_cons: 20, atk_prov: 10}, {atk_cons: 10, atk_prov: 20}, {atk_cons: 30, atk_prov: 10}, {atk_cons: 10, atk_prov: 30}] # Cutoff when computing approximated metrics
   ranker: [AIMLE]
-  scale: [0.75] # , 0.75, 0.9]
+  scale: [0.95] # , 0.75, 0.9]
 
 
 
