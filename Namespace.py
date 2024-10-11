@@ -33,6 +33,14 @@ class Namespace:
             self.atk = experiment['atk']
             self.type = experiment['g_n']
             self.ranker = experiment['ranker']
+            try:
+                self.atk_con = experiment['atk']['atk_cons']
+            except KeyError:
+                pass
+            try:
+                self.atk_pro = experiment['atk']['atk_prov']
+            except KeyError:
+                pass
             if self.ranker == 'base':
                 self.ablation = experiment['ablation']
         elif self.mo_method == 'multifr':
@@ -42,7 +50,7 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
-        elif self.mo_method == 'FLEXMORE_SCALE' or self.mo_method == 'FLEXMORE_ABL':
+        elif self.mo_method == 'FLEXMORE_SCALE' or self.mo_method == 'FLEXMORE_ABL' or self.mo_method == 'FLEXMORE_EPO':
             try:
                 self.atk_con = experiment['atk']['atk_cons']
             except KeyError:

@@ -29,14 +29,18 @@ import pickle
 from imle.aimle import aimle
 from imle.target import AdaptiveTargetDistribution, TargetDistribution
 from torch.nn import Sigmoid
+from epo_lp import EPO_LP
 
 
 def rank(seq: Tensor) -> Tensor:
     res = torch.argsort(torch.argsort(seq, dim=1, descending=True)) + 1
     return res.float()
 
+
 # Adaptive Implicit MLE (https://arxiv.org/abs/2209.04862, AAAI 2023)
 target_distribution = AdaptiveTargetDistribution(beta_update_step=1e-2)
+
+
 # Implicit MLE (https://arxiv.org/abs/2106.01798, NeurIPS 2021)
 # target_distribution = TargetDistribution(alpha=1.0, beta=100.0)
 
@@ -48,18 +52,28 @@ def differentiable_ranker(weights_batch: Tensor) -> Tensor:
 
 class AIMLE_ranking:
     def __init__(self):
-      pass
+        pass
 
     def __call__(self,
                  input: Tensor) -> Tensor:
         ranks_2d = differentiable_ranker(input)
         return ranks_2d
 
-warnings.filterwarnings("ignore")
 
+warnings.filterwarnings("ignore")
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
+def getNumParams(params):
+    numParams, numTrainable = 0, 0
+    for param in params:
+        npParamCount = np.prod(param.data.shape)
+        numParams += npParamCount
+        if param.requires_grad:
+            numTrainable += npParamCount
+    return numParams, numTrainable
 
 
 def parse_args():
@@ -68,8 +82,8 @@ def parse_args():
     parser.add_argument('--start', type=int, default=1)
     parser.add_argument('--end', type=int, default=None)
 
-
     return parser.parse_args()
+
 
 def generate_pred_list(model, train_matrix, topk=20):
     num_users = train_matrix.shape[0]
@@ -115,6 +129,7 @@ def generate_pred_list(model, train_matrix, topk=20):
 
     return pred_list, score_list, raw_score_list
 
+
 def compute_metrics(test_set, pred_list, metric):
     metric, k = metric.split('@')[0], int(metric.split('@')[1])
     if metric == 'ndcg':
@@ -136,6 +151,7 @@ def compute_metrics(test_set, pred_list, metric):
     return precision, recall, MAP, ndcg
     '''
 
+
 def neg_item_pre_sampling(train_matrix, num_neg_candidates=500):
     num_users, num_items = train_matrix.shape
     user_neg_items = []
@@ -146,6 +162,7 @@ def neg_item_pre_sampling(train_matrix, num_neg_candidates=500):
     user_neg_items = np.asarray(user_neg_items)
 
     return user_neg_items
+
 
 def statistics_occurrence(top_id, popular_dict):
     pop_occurrence = []
@@ -178,8 +195,7 @@ def rec_to_elliot(iter, top200_id, dataset, exp_string):
     if not os.path.exists(f'results/{args.data}/recs'):
         os.makedirs(f'results/{args.data}/recs')
     rec_elliot.to_csv(f'results/{args.data}/recs/{exp_string}_it={iter}_recs.tsv',
-                                        sep='\t', index=False, header=False)
-
+                      sep='\t', index=False, header=False)
 
 
 def exp_string(i, args):
@@ -187,7 +203,8 @@ def exp_string(i, args):
     tail = '-'.join(f'{key}={value}' for key, value in vars(args).items()
                     if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric']).replace('.', '$')
     tail_reduced = '-'.join(f'{key}={value}' for key, value in vars(args).items()
-                    if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric', 'batch_size', 'n_epochs', 'ranker']).replace('.', '$')
+                            if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric', 'batch_size',
+                                           'n_epochs', 'ranker']).replace('.', '$')
     return str(i) + '-' + head + '-' + tail_reduced
 
 
@@ -259,7 +276,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
+    if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -279,6 +296,13 @@ def train(args, exp_id, val_best):
             tasks.append('3')
     else:
         tasks.append('1')
+
+    if args.mo_method in ['FLEXMORE_EPO']:
+        _, n_params = getNumParams(model.parameters())
+        # preference = np.abs(np.random.randn(1, len(tasks)))
+        preference = np.array([args.scale1, 1 - args.scale1, 1 - args.scale1])
+        # preference /= preference.sum(axis=1, keepdims=True)
+        epo_lp = EPO_LP(m=len(tasks), n=n_params, r=preference)
 
     history_losses = {'batch_loss': []}
     for t in tasks:
@@ -311,8 +335,8 @@ def train(args, exp_id, val_best):
         else:
             pos_ids_for_tail_list.append(train_user_tail_list[i])
         neg_ids_for_tail_list.append(negsamp_vectorized_bsearch_preverif(np.array(train_user_list[i]), item_size,
-                                                                n_samp=max_pos - len(pos_ids_for_tail_list[i])))
-
+                                                                         n_samp=max_pos - len(
+                                                                             pos_ids_for_tail_list[i])))
 
     sampled_ids = np.ones((user_size, max_pos)) * item_size
     sampled_tail_ids = np.ones((user_size, max_pos)) * item_size
@@ -327,7 +351,6 @@ def train(args, exp_id, val_best):
 
         labels[i][:len(pos_ids_list[i])] = 1
         labels_tail[i][:len(pos_ids_for_tail_list[i])] = 1
-
 
     sampled_ids = torch.LongTensor(sampled_ids).to(args.device)
     labels = torch.LongTensor(labels).to(args.device)
@@ -345,12 +368,18 @@ def train(args, exp_id, val_best):
             # acc = torch.tensor(0)
             # acc_ndcg = torch.tensor(0)
             print("Epoch:", iter + 1)
+            if args.mo_method in ['FLEXMORE_EPO']:
+                n_linscalar_adjusts = 0
+                descent = 0.
 
             # start_epoch = time.time()
             model.train()
 
             # Start Training
             for _ in tqdm(range(num_batches), desc='Batch Progress Bar'):
+                if args.mo_method in ['FLEXMORE_EPO']:
+                    grads = {}
+                    losses = []
                 # start_batch = time.time()
                 # print("Batch: ", batch_id)
                 user, pos, neg = sampler.next_batch()
@@ -368,7 +397,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
+                if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -378,9 +407,12 @@ def train(args, exp_id, val_best):
                     ranks_prov = ranker(scores_all)
                     if 'm' in args.mode:
                         idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk_con)])
-                        dcg_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + args.atk_con) + 1) / 2) * labels[unique_u]
+                        dcg_num = ((torch.tanh(
+                            -ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + args.atk_con) + 1) / 2) * labels[
+                                      unique_u]
                         # dcg = dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1)
-                        dcg = torch.sum(dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1), dim=-1)
+                        dcg = torch.sum(dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1),
+                                        dim=-1)
                         ndcg = dcg / idcg
                         # ranks_prov = ranks_prov[unique_u]
                         # ranks_prov.gather(1, sampled_ids[unique_u])
@@ -396,7 +428,7 @@ def train(args, exp_id, val_best):
                         # del scores
 
                         # loss['2'] = (torch.square(1 - ndcg)).sum()
-                        if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE']:
+                        if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
                         else:
                             loss['2'] = torch.square(1 - ndcg).sum()
@@ -425,8 +457,9 @@ def train(args, exp_id, val_best):
                             del ranks_prov
                         else:
                             if 'd' in args.mode:
-                                raplt_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_tail_ids[unique_u]) + args.atk_pro) + 1) / 2) * labels_tail[unique_u]
-                                raplt_num = torch.sum(raplt_num, dim=-1) # raplt_num / args.atk
+                                raplt_num = ((torch.tanh(-ranks_prov[unique_u].gather(1, sampled_tail_ids[
+                                    unique_u]) + args.atk_pro) + 1) / 2) * labels_tail[unique_u]
+                                raplt_num = torch.sum(raplt_num, dim=-1)  # raplt_num / args.atk
                                 raplt = raplt_num / args.atk_pro
                                 # for el in unique_u:
                                 #     raplt.append(torch.sum((torch.tanh(
@@ -443,7 +476,7 @@ def train(args, exp_id, val_best):
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                     loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
                                 else:
-                                    if args.mo_method in ['FLEXMORE', 'FLEXMORE_SCALE']:
+                                    if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                                         loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
                                     else:
                                         loss['3'] = torch.square(1 - ranks_prov).sum()
@@ -514,7 +547,8 @@ def train(args, exp_id, val_best):
                         # print("genre_mask:", genre_mask.shape)
                         # print("genre_top_mask:", genre_top_mask.shape)
 
-                        genre_exposure = torch.matmul(genre_top_mask.reshape(genre_num, -1), sys_exposure.reshape(-1, 1))
+                        genre_exposure = torch.matmul(genre_top_mask.reshape(genre_num, -1),
+                                                      sys_exposure.reshape(-1, 1))
                         # print("genre_exposure:", genre_exposure.shape)
                         genre_exposure = genre_exposure / genre_exposure.sum()
 
@@ -526,11 +560,11 @@ def train(args, exp_id, val_best):
                         loss['3'] = torch.tensor(0)
 
                 # Use MOOP or not
-                if args.mo_method in ['FLEXMORE', 'multifr']:
+                if args.mo_method in ['FLEXMORE_MGDA', 'multifr']:
                     # Copy the loss data. Average loss1 for calculating scale
                     for k in loss:
                         if k == '1':
-                            loss_clone[k] = loss[k].clone() #/ args.batch_size
+                            loss_clone[k] = loss[k].clone()  # / args.batch_size
                         elif k == '2':
                             loss_clone[k] = loss[k].clone()
                         else:
@@ -560,6 +594,54 @@ def train(args, exp_id, val_best):
                     sol, min_norm = MinNormSolver.find_min_norm_element([grads[t] for t in tasks])
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
+                elif args.mo_method in ['FLEXMORE_EPO']:
+                    for k in loss:
+                        if k == '1':
+                            loss_clone[k] = loss[k].clone()  # / args.batch_size
+                        elif k == '2':
+                            loss_clone[k] = loss[k].clone()
+                        else:
+                            loss_clone[k] = loss[k].clone()
+                    for i in tasks:
+                        optimizer.zero_grad()
+                        # task_loss = model(X, ts)
+                        losses.append(loss_clone[i].data.cpu().numpy())
+                        loss_clone[i].backward(retain_graph=True)
+                        loss_data[i] = loss_clone[i].item()
+                        # One can use scalable method proposed in the MOO-MTL paper
+                        # for large scale problem; but we use the gradient
+                        # of all parameters in this experiment.
+                        grads[i] = []
+                        for param in model.parameters():
+                            if param.grad is not None:
+                                grads[i].append(Variable(param.grad.data.clone().flatten(), requires_grad=False))
+
+                    grads_list = [torch.cat(grads[t]) for t in tasks]
+                    G = torch.stack(grads_list)
+                    GG = G @ G.T
+                    losses = np.stack(losses)
+                    try:
+                        # Calculate the alphas from the LP solver
+                        sol = epo_lp.get_alpha(losses, G=GG.cpu().numpy(), C=True)
+                        if epo_lp.last_move == "dom":
+                            descent += 1
+                    except Exception as e:
+                        # print(e)
+                        # print(f'losses:{losses}')
+                        # print(f'C:\n{GG.cpu().numpy()}')
+                        # raise RuntimeError('manual tweak')
+                        sol = None
+                    if sol is None:  # A patch for the issue in cvxpy
+                        sol = preference / preference.sum()
+                        n_linscalar_adjusts += 1
+
+                    if torch.cuda.is_available():
+                        sol = len(tasks) * torch.from_numpy(sol).cuda()
+                    else:
+                        sol = len(tasks) * torch.from_numpy(sol)
+                    for i, t in enumerate(tasks):
+                        scale[t] = float(sol[i])
+
                 else:
                     scale = {'1': args.scale1, '2': 1.0 - args.scale1, '3': 1.0 - args.scale1, '4': 1.0 - args.scale1}
 
@@ -596,7 +678,7 @@ def train(args, exp_id, val_best):
                 # Generate list of recommendation
                 pred_list, score_matrix, raw_score_matrix = generate_pred_list(model, train_matrix, topk=50)
                 # Save list of recommendation for later use
-                rec_to_elliot(iter+1, pred_list, dataset, exp_id)
+                rec_to_elliot(iter + 1, pred_list, dataset, exp_id)
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')
                 val_metric = compute_metrics(val_user_list, pred_list, args.metric)
@@ -609,7 +691,8 @@ def train(args, exp_id, val_best):
                             os.makedirs(f'arrays/{args.data}/')
                         #  np.savez_compressed(f'arrays/{args.data}/{exp_id}.npz', model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
                         np.savez_compressed(f'arrays/{args.data}/{args.backbone}_{args.mo_method}_{args.data}.npz',
-                                            model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(), fmt='%f')
+                                            model.predict(torch.tensor(users).to(device)).cpu().detach().numpy(),
+                                            fmt='%f')
                 # precision, recall, MAP, ndcg = compute_metrics(val_user_list, pred_list, topk=20)
                 print(f'Validation metric: {args.metric}, Value: {val_metric}')
                 validation_scores.append((iter + 1, val_metric))
@@ -651,7 +734,7 @@ def train(args, exp_id, val_best):
                 pop_rate = Popularity_rate(pop_occurrence)
                 print("Simpson_Diversity:")
                 sim_d = Simpson_Diversity(pop_occurrence)
-                
+
                 for k in range(0, len(precision)):
                     part_res = [iter, (k+1)*5, precision[k], recall[k], ndcg[k], gini[k], pop_rate[k], sim_d[k], f_i[k], f_u[k]]
                     for c,v in loss.items():
@@ -726,7 +809,8 @@ if __name__ == '__main__':
     '''
     Processing of data information
     '''
-    dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(settings)
+    dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(
+        settings)
     genre_mask = genre_mask.to(device)
     popular_tuple = OrderedDict(sorted(popular_dict.items()))
     popular_list = [x[1] for x in popular_tuple.items()]
