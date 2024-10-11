@@ -614,7 +614,9 @@ def train(args, exp_id, val_best):
                         grads[i] = []
                         for param in model.parameters():
                             if param.grad is not None:
-                                grads[i].append(Variable(param.grad.data.clone().flatten(), requires_grad=False))
+                                tmp = Variable(param.grad.data.clone(), requires_grad=False).to(args.device)
+                                tmp = tmp.flatten()
+                                grads[t].append(tmp)
 
                     grads_list = [torch.cat(grads[t]) for t in tasks]
                     G = torch.stack(grads_list)
