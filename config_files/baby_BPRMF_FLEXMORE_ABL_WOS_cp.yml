@@ -1,6 +1,6 @@
 setting:
   data: amazon_baby # Dataset
-  gpu_id: 2 # GPU_ID
+  gpu_id: 0 # GPU_ID
   baseline: BPRMF # Base model
   wrapper: FLEXMORE_ABL_WOS # Multi-Objective Method
   epochs: 500 # Number of epochs
