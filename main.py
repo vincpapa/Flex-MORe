@@ -457,9 +457,9 @@ def train(args, exp_id, val_best):
                         if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
                         elif args.mo_method in ['FLEXMORE_ABL_WOS']:
-                            loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - ndcg)).sum()
+                            loss['2'] = normalize_loss_wo_sigmoid(torch.square(1 - ndcg)).sum()
                         elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
-                            loss['3'] = normalize_loss_wo_zeta(torch.square(1 - ndcg)).sum()
+                            loss['2'] = normalize_loss_wo_zeta(torch.square(1 - ndcg)).sum()
                         else:
                             loss['2'] = torch.square(1 - ndcg).sum()
                         # acc_ndcg = acc_ndcg + loss['2']/len(unique_u)
