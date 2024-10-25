@@ -226,6 +226,32 @@ def normalize_loss(data):
     # print(norm_utopia_point)
     return z_scores  # , (norm_utopia_point-z_scores)
 
+def normalize_loss_wo_sigmoid(data):
+    # sigmoid = Sigmoid()
+    mean = torch.mean(data)
+    # print(mean)
+    std_dev = torch.std(data)
+    # print(std_dev)
+    z_scores = (data - mean) / std_dev
+    # z_scores = sigmoid(z_scores)
+    # utopia_point = 0
+    # norm_utopia_point = (utopia_point -mean)/std_dev
+    # print(norm_utopia_point)
+    return z_scores  # , (norm_utopia_point-z_scores)
+
+def normalize_loss_wo_zeta(data):
+    sigmoid = Sigmoid()
+    # mean = torch.mean(data)
+    # print(mean)
+    # std_dev = torch.std(data)
+    # print(std_dev)
+    # z_scores = (data - mean) / std_dev
+    data = sigmoid(data)
+    # utopia_point = 0
+    # norm_utopia_point = (utopia_point -mean)/std_dev
+    # print(norm_utopia_point)
+    return data  # , (norm_utopia_point-z_scores)
+
 
 def train(args, exp_id, val_best):
     # pre-sample a small set of negative samples
@@ -430,6 +456,10 @@ def train(args, exp_id, val_best):
                         # loss['2'] = (torch.square(1 - ndcg)).sum()
                         if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
+                        elif args.mo_method in ['FLEXMORE_ABL_WOS']:
+                            loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - ndcg)).sum()
+                        elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
+                            loss['3'] = normalize_loss_wo_zeta(torch.square(1 - ndcg)).sum()
                         else:
                             loss['2'] = torch.square(1 - ndcg).sum()
                         # acc_ndcg = acc_ndcg + loss['2']/len(unique_u)
@@ -478,6 +508,10 @@ def train(args, exp_id, val_best):
                                 else:
                                     if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                                         loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
+                                    elif args.mo_method in ['FLEXMORE_ABL_WOS']:
+                                        loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - ranks_prov)).sum()
+                                    elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
+                                        loss['3'] = normalize_loss_wo_zeta(torch.square(1 - ranks_prov)).sum()
                                     else:
                                         loss['3'] = torch.square(1 - ranks_prov).sum()
 
