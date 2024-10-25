@@ -13,7 +13,7 @@ hyperparameters:
   l_2: [0.005] #L2 penalty
   mode: [rpms] # Which loss to use (MPR-rpa)
   g_n: [loss+] # Modality of gradient normalization
-  atk: [20] # Cutoff in metrics approximation
+  atk: [{atk_cons: 20, atk_prov: 20}] # Cutoff in metrics approximation
   ranker: [AIMLE] # Which Ranking Approx. to use (AIMLE -> MPR)
   layers: [3]
   message_dropout: [0.1]
