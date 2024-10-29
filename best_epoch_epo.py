@@ -25,15 +25,15 @@ for dataset in datasets:
                     if store_validation != {}:
                         maximumValue = max(store_validation.values(), key=lambda k: k[1])
                         maxKey = next(k for k, v in store_validation.items() if v == maximumValue)
-
-                        print(maxKey, maximumValue)
-                        rec = f'results/{dataset}/recs/{maxKey}_it={maximumValue[0]}_recs.tsv'
-                        if not os.path.exists(f'results/{dataset}/best_recs'):
-                            os.makedirs(f'results/{dataset}/best_recs')
-                        dst = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_recs.tsv'
-                        shutil.copyfile(rec, dst)
-                        loss = f'results/{dataset}/losses/{maxKey}_loss.pkl'
-                        dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
-                        shutil.copyfile(loss, dst_loss)
+                        if method in maxKey:
+                            print(maxKey, maximumValue)
+                            rec = f'results/{dataset}/recs/{maxKey}_it={maximumValue[0]}_recs.tsv'
+                            if not os.path.exists(f'results/{dataset}/best_recs'):
+                                os.makedirs(f'results/{dataset}/best_recs')
+                            dst = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_recs.tsv'
+                            shutil.copyfile(rec, dst)
+                            loss = f'results/{dataset}/losses/{maxKey}_loss.pkl'
+                            dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
+                            shutil.copyfile(loss, dst_loss)
 
 
