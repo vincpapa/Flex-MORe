@@ -13,7 +13,7 @@ hyperparameters:
   l_2: [0.01, 0.005, 0.001] #L2 penalty
   mode: [rpms] # Which loss to use
   g_n: [loss+] # Modality of gradient normalization
-  atk: [20] # Cutoff when computing approximated metrics
+  atk: [{atk_cons: 20, atk_prov: 20}] # Cutoff when computing approximated metrics
   ranker: [AIMLE]
   scale: [0.25, 0.5] # , 0.75, 0.9]
 

@@ -389,7 +389,9 @@ def train(args, exp_id, val_best):
     for k, v in dataset['user_mapping'].items():
         users.append(v)
     try:
+        epoch_times = []
         for iter in range(args.n_epochs):
+            # start_time = time.time()
             # loss['3'] = torch.tensor(0)
             # acc = torch.tensor(0)
             # acc_ndcg = torch.tensor(0)
@@ -398,7 +400,7 @@ def train(args, exp_id, val_best):
                 n_linscalar_adjusts = 0
                 descent = 0.
 
-            # start_epoch = time.time()
+            start_epoch = time.time()
             model.train()
 
             # Start Training
@@ -693,10 +695,13 @@ def train(args, exp_id, val_best):
                 batch_loss.backward()
                 optimizer.step()
 
+
             # if args.mo_method == 'FLEXMORE':
             #     print(f"\nAPLT loss:\t{acc / num_batches} (the lower the better, [0,1])")
             #     print(f"Approx nDCG loss:\t{acc_ndcg / num_batches} (the lower the better, [0,1])")
-
+            end_epoch = time.time()
+            epoch_times.append(end_epoch - start_epoch)
+            print('Epoch time: {:.6f}'.format(end_epoch-start_epoch))
             print('***** Weights Values *****')
             print('\n'.join('\'{:s}\': {:.10f}'.format(k, scale[k]) for k in tasks))
             # print('bpr_loss:{:.6f}, user_disparity:{:.6f}, item_disparity:{:.6f}'.format(loss['1'].item(),
@@ -705,7 +710,7 @@ def train(args, exp_id, val_best):
             print('***** Loss Values *****')
             print('\n'.join('\'{:s}\': {:.10f}'.format(k, loss[k]) for k in tasks))
             # print('bpr_loss:{:.6f}, first_loss:{:.6f}, second_loss:{:.6f}'.format(loss['1'].item(), loss['2'].item(), loss['3'].item()))
-            # print('Epoch time: {:.6f}'.format(time.time()-start_epoch))
+
             # end = time.time()
             # print("time:{:.2f}".format(end - start))
 
@@ -793,6 +798,7 @@ def train(args, exp_id, val_best):
         pd.DataFrame(results, columns=columns).to_csv(f'results/{args.data}/performance/{args.backbone}_{args.mo_method}_{eventid}_performance.tsv', sep='\t',
                                      index=False)
         '''
+        print(f'TRAINING TIME: {sum(epoch_times)}')
         if not os.path.exists(f'results/{args.data}/losses'):
             os.makedirs(f'results/{args.data}/losses')
         with open(f'results/{args.data}/losses/{exp_id}_loss.pkl', 'wb') as f:
