@@ -798,6 +798,7 @@ def train(args, exp_id, val_best):
         pd.DataFrame(results, columns=columns).to_csv(f'results/{args.data}/performance/{args.backbone}_{args.mo_method}_{eventid}_performance.tsv', sep='\t',
                                      index=False)
         '''
+        print(epoch_times)
         print(f'TRAINING TIME: {sum(epoch_times)}')
         if not os.path.exists(f'results/{args.data}/losses'):
             os.makedirs(f'results/{args.data}/losses')
