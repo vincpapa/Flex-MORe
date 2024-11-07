@@ -801,6 +801,7 @@ def train(args, exp_id, val_best):
         '''
         print(epoch_times)
         print(f'TRAINING TIME: {sum(epoch_times)}')
+        print(f'MEAN TRAINING TIME: {sum(epoch_times) / len(epoch_times)}')
         if not os.path.exists(f'results/{args.data}/losses'):
             os.makedirs(f'results/{args.data}/losses')
         with open(f'results/{args.data}/losses/{exp_id}_loss.pkl', 'wb') as f:
