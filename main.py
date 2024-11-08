@@ -255,7 +255,7 @@ def normalize_loss_wo_zeta(data):
 
 def train(args, exp_id, val_best):
     # pre-sample a small set of negative samples
-    evaluation = False
+    evaluation = True
     t1 = time.time()
     user_neg_items = neg_item_pre_sampling(train_matrix, num_neg_candidates=500)
     pre_samples = {'user_neg_items': user_neg_items}
