@@ -6,13 +6,13 @@ import os
 
 datasets = ['amazon_baby', 'amazon_music', 'facebook_books']
 backbones = ['BPRMF']
-method = 'FLEXMORE'
+method = 'FLEXMORE_SCALE'
 for dataset in datasets:
     for backbone in backbones:
 
-        if method == 'FLEXMORE':
+        if method == 'FLEXMORE_SCALE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*{method}*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
                 for k, v in list(store_validation.items()):
@@ -34,9 +34,9 @@ for dataset in datasets:
                     dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                     shutil.copyfile(loss, dst_loss)
 
-        if method == 'FLEXMORE':
+        if method == 'FLEXMORE_SCALE':
 
-            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*'):
+            for file in glob.glob(f'results/{dataset}/performance/*{backbone}*{method}*'):
                 with open(file, 'rb') as handle:
                     store_validation = pickle.load(handle)
                 for k, v in list(store_validation.items()):
