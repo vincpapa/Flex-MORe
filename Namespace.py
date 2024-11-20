@@ -30,7 +30,7 @@ class Namespace:
             self.node_dropout = experiment['node_dropout']
             self.normalize = experiment['normalize']
 
-        if self.mo_method == 'FLEXMORE':
+        if self.mo_method == 'FLEXMORE_MGDA':
             self.atk = experiment['atk']
             self.type = experiment['g_n']
             self.ranker = experiment['ranker']
