@@ -10,7 +10,7 @@ class Namespace:
         self.metric = settings['validation_metric']
         self.batch_size = settings['batch_size']
         self.n_epochs = settings['epochs']
-        self.seed = settings['seed']
+        self.seed = experiment['seed']
         if self.backbone == 'BPRMF':
             self.dim = experiment['dim']
             self.lr = experiment['lr']
