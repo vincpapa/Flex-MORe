@@ -19,7 +19,7 @@ class MatrixFactorization(nn.Module):
         self.num_users = num_users
         self.num_items = num_items
         self.l_w = args.weight_decay
-        random_seed = 42
+        random_seed = args.seed
         random.seed(random_seed)
         np.random.seed(random_seed)
         torch.manual_seed(random_seed)
