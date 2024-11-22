@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_baby', 'amazon_music', 'facebook_books']
+datasets = ['amazon_baby', 'facebook_books']
 backbones = ['BPRMF']
 method = 'FLEXMORE_SCALE'
 scales = ['0$25', '0$5', '0$75', '0$95']
