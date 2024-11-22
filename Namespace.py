@@ -10,7 +10,10 @@ class Namespace:
         self.metric = settings['validation_metric']
         self.batch_size = settings['batch_size']
         self.n_epochs = settings['epochs']
-        self.seed = experiment['seed']
+        try:
+            self.seed = experiment['seed']
+        except KeyError:
+            self.seed = 42
         if self.backbone == 'BPRMF':
             self.dim = experiment['dim']
             self.lr = experiment['lr']
