@@ -198,13 +198,15 @@ def rec_to_elliot(iter, top200_id, dataset, exp_string):
                       sep='\t', index=False, header=False)
 
 
+
+
 def exp_string(i, args):
     head = '-'.join(f'{key}={value}' for key, value in vars(args).items() if key in ['backbone', 'mo_method', 'mode'])
     tail = '-'.join(f'{key}={value}' for key, value in vars(args).items()
                     if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric']).replace('.', '$')
     tail_reduced = '-'.join(f'{key}={value}' for key, value in vars(args).items()
                             if key not in ['backbone', 'mo_method', 'mode', 'device', 'every', 'metric', 'batch_size',
-                                           'n_epochs', 'ranker']).replace('.', '$')
+                                           'n_epochs', 'ranker', 'atk']).replace('.', '$')
     return str(i) + '-' + head + '-' + tail_reduced
 
 
