@@ -16,9 +16,7 @@ for dataset in datasets:
                     with open(file, 'rb') as handle:
                         store_validation = pickle.load(handle)
                     for k, v in list(store_validation.items()):
-                        if 'mode=rm' not in k:
-                            del store_validation[k]
-                        if not k.endswith(scale):
+                        if 'mode=rm' not in k and not k.endswith(scale):
                             del store_validation[k]
                     for k, v in store_validation.items():
                         store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
@@ -42,9 +40,7 @@ for dataset in datasets:
                     with open(file, 'rb') as handle:
                         store_validation = pickle.load(handle)
                     for k, v in list(store_validation.items()):
-                        if 'mode=rp' not in k:
-                            del store_validation[k]
-                        if not k.endswith(scale):
+                        if 'mode=rp' not in k and not k.endswith(scale):
                             del store_validation[k]
                     for k, v in store_validation.items():
                         store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
