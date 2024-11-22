@@ -5,7 +5,7 @@ import os
 
 
 datasets = ['amazon_baby', 'facebook_books']
-backbones = ['NGCF']
+backbones = ['BPRMF']
 method = 'FLEXMORE_EPO'
 scales = ['0$95'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
 for dataset in datasets:
