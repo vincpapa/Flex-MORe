@@ -4,7 +4,7 @@ import shutil
 import os
 
 
-datasets = ['amazon_baby'] # ['amazon_baby', 'facebook_books']
+datasets = ['amazon_music'] # ['amazon_baby', 'facebook_books']
 backbones = ['BPRMF','NGCF']
 method = 'FLEXMORE_MGDA'
 seeds = ['7', '82', '185'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
