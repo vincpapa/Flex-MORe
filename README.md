@@ -1,5 +1,5 @@
 # Flex-MORe: A Flexible Multi-Objective Recommendation Framework
-This repository contains the source codes and datasets of the paper _Flex-MORe: A Flexible Multi-Objective Recommendation Framework_ submitted at WSDM 2024.
+This repository contains the source codes and datasets of the paper _Flex-MORe: A Flexible Multi-Objective Recommendation Framework_ submitted at SIGIR 2025.
 
 ### Requirements
 We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `NGCF` model require `PyTorch Geometric`. Then, the requirements listed in the `requirements.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
@@ -20,6 +20,7 @@ In the following, we explain how to run the models within the paper.
   ```
   $ CUBLAS_WORKSPACE_CONFIG=:4096:8 python3 -u main.py --config [CONFIGURATION_FILE_NAME]
   ```
+  The configuration files are in the folder `config_files`. Consider `_dataset_backbone_FLEXMORE_SCALE_cp.yml` as the configuration files for Flex-MORe by changing `dataset` and `backbone` at you convenience. Consider `_dataset_backbone_multifr_cp.yml` as the configuration files for MultiFR.
 - CPFAIR can be executed through the `main_cpfair.py` script. It requires the matrix of scores (user, item) predicted by a backbone model (in this paper BPRMF and NGCF). For this reason, this code is prepared in order to load such matrix saved with `.npz` [extension](https://numpy.org/doc/stable/reference/generated/numpy.savez_compressed.html) from a folder called `arrays`.  You may train the model by running the following code:
   ```
   $ python3 -u main_cpfair.py
