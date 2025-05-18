@@ -1,5 +1,5 @@
 # Flex-MORe: A Flexible Multi-Objective Recommendation Framework
-This repository contains the source codes and datasets of the paper _Flex-MORe: A Flexible Multi-Objective Recommendation Framework_ submitted at SIGIR 2025.
+This repository contains the source codes and datasets of the paper _Flex-MORe: A Flexible Multi-Objective Recommendation Framework_.
 
 ### Requirements
 We implemented and tested the models in Python `3.8.10`, with `PyTorch==2.0.1` and CUDA `11.7`. The `NGCF` model require `PyTorch Geometric`. Then, the requirements listed in the `requirements.txt` file refer to these versions. You may create the virtual environment with the requirements file as follows:
@@ -86,3 +86,16 @@ In the following tables, we report the explicit numerical results regarding the 
 | NGCF-MultiFR   | 0.0562   | 0.0993     | 0.2873   | 9379   | 0.0890   | 0.7950  | 0.0089  | 0.0050       | 0.0089  |
 | NGCF-CPFair    | 0.0009   | 0.0021     | 0.3800   | 9948   | 0.3731   | 0.1798  | 0.0003  | 0.0003       | 0.0003  |
 
+### Additional Plots
+In the following tables, we report the Pareto frontiers of the performance achieved by FlexMORe by varing the weights values.
+
+- Pareto frontiers obtained using Flex-MORe on the three datasets adopting NGCF as the backbone by varying the
+values of 𝝎BPR. The blue points refer to the models trained with Flex-MORe. Their labels are the 𝝎BPR values. The red points
+refer to the “vanilla” BPRMF. For 𝜎2
+(nDCG), the negative values are reported to have “the higher the better” semantic.
+<img src="images/bprmf-pareto-frontiers.png">
+- Pareto frontiers obtained using Flex-MORe on the three datasets adopting NGCF as the backbone by varying the
+values of 𝝎BPR. The blue points refer to the models trained with Flex-MORe. Their labels are the 𝝎BPR values. The red points
+refer to the “vanilla” NGCF. For 𝜎2
+(nDCG), the negative values are reported to have “the higher the better” semantic.
+<img src="images/ngcf-pareto-frontiers.png">
