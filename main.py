@@ -685,8 +685,8 @@ def train(args, exp_id, val_best):
 
                 elif args.mo_method in ['ADAFLEXMORE']:
                     sol = []
-                    # if 'r' in args.mode:
-                    #    sol.append(torch.square(loss['1']))
+                    if 'r' in args.mode:
+                        sol.append(torch.square(loss['1']))
                     if 'm' in args.mode:
                         sol.append(torch.square(1 - ndcg).mean())
                     if 'p' in args.mode:
