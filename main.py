@@ -305,7 +305,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+    if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -428,7 +428,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+                if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -459,7 +459,7 @@ def train(args, exp_id, val_best):
                         # del scores
 
                         # loss['2'] = (torch.square(1 - ndcg)).sum()
-                        if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
+                        if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
                         elif args.mo_method in ['FLEXMORE_ABL_WOS']:
                             loss['2'] = normalize_loss_wo_sigmoid(torch.square(1 - ndcg)).sum()
@@ -511,7 +511,7 @@ def train(args, exp_id, val_best):
                                     user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                     loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
                                 else:
-                                    if args.mo_method in ['FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
+                                    if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                                         loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
                                     elif args.mo_method in ['FLEXMORE_ABL_WOS']:
                                         loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - ranks_prov)).sum()
@@ -522,7 +522,7 @@ def train(args, exp_id, val_best):
 
                                 # loss['3'] = loss['3'] + ranks_prov
                                 # acc = acc + ranks_prov/len(unique_u)
-                            del ranks_prov
+                            # del ranks_prov
 
                     else:
                         loss['3'] = torch.tensor(0)
@@ -683,6 +683,17 @@ def train(args, exp_id, val_best):
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
 
+                elif args.mo_method in ['ADAFLEXMORE']:
+                    sol = []
+                    # if 'r' in args.mode:
+                    #    sol.append(torch.square(loss['1']))
+                    if 'm' in args.mode:
+                        sol.append(torch.square(1 - ndcg).mean())
+                    if 'p' in args.mode:
+                        sol.append(torch.square(1 - ranks_prov).mean())
+                    sol = F.softmax(torch.tensor(sol), dim=0)
+                    for i, t in enumerate(tasks):
+                        scale[t] = float(sol[i])
                 else:
                     scale = {'1': args.scale1, '2': 1.0 - args.scale1, '3': 1.0 - args.scale1, '4': 1.0 - args.scale1}
 

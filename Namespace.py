@@ -65,6 +65,18 @@ class Namespace:
                 pass
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
+        elif self.mo_method == 'ADAFLEXMORE':
+            self.atk = experiment['atk']
+            try:
+                self.atk_con = experiment['atk']['atk_cons']
+            except KeyError:
+                pass
+            try:
+                self.atk_pro = experiment['atk']['atk_prov']
+            except KeyError:
+                pass
+            self.ranker = experiment['ranker']
+
 
 
 
