@@ -694,7 +694,10 @@ def train(args, exp_id, val_best):
                     if 'm' in args.mode:
                         sol.append(torch.square(1 - ndcg).mean())
                     if 'p' in args.mode:
-                        sol.append(torch.square(1 - ranks_prov).mean())
+                        if args.mo_method == 'ADAFLEMORE':
+                            sol.append(torch.square(1 - ranks_prov).mean())
+                        else:
+                            sol.append(torch.square(1 - ranks_prov).mean())
                     sol = F.softmax(torch.tensor(sol), dim=0)
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
