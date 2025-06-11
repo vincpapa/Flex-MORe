@@ -65,7 +65,7 @@ class Namespace:
                 pass
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
-        elif self.mo_method in ['ADAFLEXMORE', 'ADAFLEXMORE05']:
+        elif self.mo_method in ['ADAFLEXMORE', 'ADAFLEXMORE05','USERADAFLEXMORE']:
             self.atk = experiment['atk']
             try:
                 self.atk_con = experiment['atk']['atk_cons']

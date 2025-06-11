@@ -64,6 +64,24 @@ class MatrixFactorization(nn.Module):
         return bpr_loss + reg_loss
         # return bpr_loss
 
+    def custom_forward(self, user_id, pos_id, neg_id):
+        user_emb = self.user_embeddings(user_id)
+        pos_emb = self.item_embeddings(pos_id)
+        neg_emb = self.item_embeddings(neg_id)
+
+        pos_scores = torch.sum(torch.mul(user_emb, pos_emb), dim=1)
+        neg_scores = torch.sum(torch.mul(user_emb, neg_emb), dim=1)
+
+        tmp = pos_scores - neg_scores
+
+        maxi = -1 * nn.LogSigmoid()(tmp)
+
+        b = self.l_w * (1 / 2) * (torch.norm(user_emb, dim=1) ** 2)
+        c = self.l_w * (1 / 2) * (torch.norm(pos_emb, dim=1) ** 2)
+        d = self.l_w * (1 / 2) * (torch.norm(neg_emb, dim=1) ** 2)
+
+        return torch.mean(maxi + b + c + d), maxi + b + c + d
+
     def predict(self, user_id):
         # user_id = Variable(torch.from_numpy(user_id).long(), requires_grad=False).to(self.device)
         user_emb = self.user_embeddings(user_id)

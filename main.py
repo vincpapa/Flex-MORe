@@ -1,3 +1,5 @@
+from webbrowser import Error
+
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -254,6 +256,21 @@ def normalize_loss_wo_zeta(data):
     # print(norm_utopia_point)
     return data  # , (norm_utopia_point-z_scores)
 
+def compute_differentiable_ndcg(users, args, ranks_prov, sampled_ids, labels):
+    idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk_con)])
+    dcg_num = ((torch.tanh(
+        -ranks_prov[users].gather(1, sampled_ids[users]) + args.atk_con) + 1) / 2) * labels[
+                  users]
+    dcg = torch.sum(dcg_num / torch.log2(ranks_prov[users].gather(1, sampled_ids[users]) + 1),
+                    dim=-1)
+    return dcg / idcg
+
+def compute_differentiable_aplt(users, ranks, args, long_tail):
+    ranks = ranks[users]
+    ranks = (torch.tanh(-ranks + args.atk_pro) + 1) / 2
+    return torch.sum(ranks[:, long_tail], dim=1) / args.atk_pro
+
+
 
 def train(args, exp_id, val_best):
     # pre-sample a small set of negative samples
@@ -305,7 +322,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['ADAFLEXMORE05', 'ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+    if args.mo_method in ['USERADAFLEXMORE','ADAFLEXMORE05', 'ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -421,14 +438,43 @@ def train(args, exp_id, val_best):
                 pos_id = torch.from_numpy(pos).type(torch.LongTensor).to(args.device)
                 neg_id = torch.from_numpy(neg).type(torch.LongTensor).to(args.device)
 
+                if args.mo_method == 'USERADAFLEXMORE':
+                    user_w = []
+                    user_val = []
                 # Backbone Model Loss
                 if 'r' in args.mode:
-                    loss['1'] = model(user_id, pos_id, neg_id)
+                    if args.mo_method == 'USERADAFLEXMORE':
+                        _, bpr_users = model.custom_forward(user_id, pos_id, neg_id)
+                        user_w.append(bpr_users)
+                        user_val.append(bpr_users)
+                        '''
+                        loss['1'], bpr_users = model.custom_forward(user_id, pos_id, neg_id)
+                        unique_user_ids, original_indices = torch.unique(user_id, sorted=True, return_inverse=True)
+                        num_unique_users = len(unique_user_ids)
+                        aggregated_bpr_users_sum = torch.zeros(num_unique_users, dtype=bpr_users.dtype)
+                        aggregated_bpr_users_count = torch.zeros(num_unique_users, dtype=bpr_users.dtype)
+                        aggregated_bpr_users_sum.scatter_reduce_(
+                            dim=0,
+                            index=original_indices,
+                            src=bpr_users,
+                            reduce="sum"
+                        )
+                        ones = torch.ones_like(bpr_users)
+                        aggregated_bpr_users_count.scatter_reduce_(
+                            dim=0,
+                            index=original_indices,
+                            src=ones,
+                            reduce="sum"
+                        )
+                        user_w = aggregated_bpr_users_sum / aggregated_bpr_users_count
+                        '''
+                    else:
+                        loss['1'] = model(user_id, pos_id, neg_id)
                 else:
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['ADAFLEXMORE05','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+                if args.mo_method in ['USERADAFLEXMORE','ADAFLEXMORE05','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -437,32 +483,15 @@ def train(args, exp_id, val_best):
                         scores_all = model.predict(users)
                     ranks_prov = ranker(scores_all)
                     if 'm' in args.mode:
-                        idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk_con)])
-                        dcg_num = ((torch.tanh(
-                            -ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + args.atk_con) + 1) / 2) * labels[
-                                      unique_u]
-                        # dcg = dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1)
-                        dcg = torch.sum(dcg_num / torch.log2(ranks_prov[unique_u].gather(1, sampled_ids[unique_u]) + 1),
-                                        dim=-1)
-                        ndcg = dcg / idcg
-                        # ranks_prov = ranks_prov[unique_u]
-                        # ranks_prov.gather(1, sampled_ids[unique_u])
-                        # dcg = []
-                        # for el in unique_u:
-                        #     labels = (torch.tanh(-ranks_prov[el][train_user_list[el]] + args.atk) + 1) / 2
-                        #     dcg.append(torch.sum(labels / torch.log2(ranks_prov[el][train_user_list[el]] + 1)))
-                        # dcg = torch.stack(dcg)
-                        # idcg = sum([1.0 / math.log(i + 2, 2) for i in range(args.atk)])
-                        # ndcg = dcg / idcg
-                        # scores = torch.gather(scores_all, 1, sampled_ids).to(args.device)
-                        # ndcg = dcg_loss(scores[unique_u], scores_all[unique_u], labels[unique_u])
-                        # del scores
-
-                        # loss['2'] = (torch.square(1 - ndcg)).sum()
+                        if args.mo_method in  ['ADAFLEXMORE05','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE','FLEXMORE_ABL_WOS','FLEXMORE_ABL_WOZ']:
+                            ndcg = compute_differentiable_ndcg(unique_u, args, ranks_prov, sampled_ids, labels)
+                        else: #  args.mo_method == 'USERADAFLEXMORE':
+                            ndcg = compute_differentiable_ndcg(user_id, args, ranks_prov, sampled_ids, labels)
                         if args.mo_method in ['ADAFLEXMORE05','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                             loss['2'] = normalize_loss(torch.square(1 - ndcg)).sum()
-                        # elif args.mo_method in ['ADAFLEXMORE05']:
-                        #     loss['2'] = normalize_loss(torch.square(0.5 - ndcg)).sum()
+                        elif args.mo_method in ['USERADAFLEXMORE']:
+                            user_w.append(torch.square(1 - ndcg))
+                            user_val.append(normalize_loss(torch.square(1 - ndcg)))
                         elif args.mo_method in ['FLEXMORE_ABL_WOS']:
                             loss['2'] = normalize_loss_wo_sigmoid(torch.square(1 - ndcg)).sum()
                         elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
@@ -505,24 +534,24 @@ def train(args, exp_id, val_best):
                                 user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                 loss['3'] = (torch.square(user_aplt - raplt)).sum()
                             else:
-                                ranks_prov = ranks_prov[unique_u]
-                                ranks_prov = (torch.tanh(-ranks_prov + args.atk_pro) + 1) / 2
-                                ranks_prov = torch.sum(ranks_prov[:, long_tail], dim=1) / args.atk_pro
-                                # ranks_prov = torch.clamp(ranks_prov, min=0, max=args.atk) / args.atk
-                                if 'c' in args.mode:
-                                    user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
-                                    loss['3'] = (torch.square(user_aplt - ranks_prov)).sum()
+                                if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE','ADAFLEXMORE05','FLEXMORE_ABL_WOS','FLEXMORE_ABL_WOZ']:
+                                    aplt = compute_differentiable_aplt(unique_u, ranks_prov, args, long_tail)
                                 else:
-                                    if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
-                                        loss['3'] = normalize_loss(torch.square(1 - ranks_prov)).sum()
-                                    elif args.mo_method in ['ADAFLEXMORE05']:
-                                        loss['3'] = normalize_loss(torch.square(0.5 - ranks_prov)).sum()
-                                    elif args.mo_method in ['FLEXMORE_ABL_WOS']:
-                                        loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - ranks_prov)).sum()
-                                    elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
-                                        loss['3'] = normalize_loss_wo_zeta(torch.square(1 - ranks_prov)).sum()
-                                    else:
-                                        loss['3'] = torch.square(1 - ranks_prov).sum()
+                                    aplt = compute_differentiable_aplt(user_id, ranks_prov, args, long_tail)
+
+                                if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
+                                    loss['3'] = normalize_loss(torch.square(1 - aplt)).sum()
+                                elif args.mo_method in ['USERADAFLEXMORE']:
+                                    user_w.append(torch.square(1 - aplt))
+                                    user_val.append(normalize_loss(torch.square(1 - aplt)))
+                                elif args.mo_method in ['ADAFLEXMORE05']:
+                                    loss['3'] = normalize_loss(torch.square(0.5 - aplt)).sum()
+                                elif args.mo_method in ['FLEXMORE_ABL_WOS']:
+                                    loss['3'] = normalize_loss_wo_sigmoid(torch.square(1 - aplt)).sum()
+                                elif args.mo_method in ['FLEXMORE_ABL_WOZ']:
+                                    loss['3'] = normalize_loss_wo_zeta(torch.square(1 - aplt)).sum()
+                                else:
+                                    loss['3'] = torch.square(1 - aplt).sum()
 
                                 # loss['3'] = loss['3'] + ranks_prov
                                 # acc = acc + ranks_prov/len(unique_u)
@@ -530,14 +559,18 @@ def train(args, exp_id, val_best):
 
                     else:
                         loss['3'] = torch.tensor(0)
-                    if 's' in args.mode:
-                        # loss['4'] = torch.log(1 + loss['2'] + loss['3']) / len(unique_u)
-                        loss['4'] = (loss['2'] + loss['3']) / len(unique_u)
-                        loss['2'] = torch.tensor(0)
-                        loss['3'] = torch.tensor(0)
-                    else:
-                        loss['2'] = loss['2'] / len(unique_u)
-                        loss['3'] = loss['3'] / len(unique_u)
+                    if args.mo_method != 'USERADAFLEXMORE':
+                        if 's' in args.mode:
+                            # loss['4'] = torch.log(1 + loss['2'] + loss['3']) / len(unique_u)
+                            loss['4'] = (loss['2'] + loss['3']) / len(unique_u)
+                            loss['2'] = torch.tensor(0)
+                            loss['3'] = torch.tensor(0)
+                        else:
+                            loss['2'] = loss['2'] / len(unique_u)
+                            loss['3'] = loss['3'] / len(unique_u)
+
+                    # if args.mo_method in ['USERADAFLEXMORE']:
+
 
                 # MultiFR Method
                 elif args.mo_method == 'multifr':
@@ -695,22 +728,31 @@ def train(args, exp_id, val_best):
                         sol.append(torch.square(1 - ndcg).mean())
                     if 'p' in args.mode:
                         if args.mo_method == 'ADAFLEMORE':
-                            sol.append(torch.square(1 - ranks_prov).mean())
+                            sol.append(torch.square(1 - aplt).mean())
                         else:
-                            sol.append(torch.square(1 - ranks_prov).mean())
+                            sol.append(torch.square(0.5 - aplt).mean())
                     sol = F.softmax(torch.tensor(sol), dim=0)
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
+                elif args.mo_method in ['USERADAFLEXMORE']:
+                    scale = {'1': 1.0, '2': 1.0, '3': 1.0, '4': 1.0}
                 else:
                     scale = {'1': args.scale1, '2': 1.0 - args.scale1, '3': 1.0 - args.scale1, '4': 1.0 - args.scale1}
 
-                batch_loss = 0
+                if args.mo_method != 'USERADAFLEXMORE':
+                    batch_loss = 0
 
-                for t in tasks:
-                    history_losses[f'loss_{t}'].append((loss[t].item(), loss[t].item() * scale[t]))
-                    batch_loss += loss[t] * scale[t]
+                    for t in tasks:
+                        history_losses[f'loss_{t}'].append((loss[t].item(), loss[t].item() * scale[t]))
+                        batch_loss += loss[t] * scale[t]
 
-                history_losses['batch_loss'].append(batch_loss.item())
+                    history_losses['batch_loss'].append(batch_loss.item())
+                else:
+                    user_w = F.softmax(torch.stack(user_w, dim=1))
+                    per_task_loss = torch.mean(user_w * torch.stack(user_val, dim=1), dim=0)
+                    batch_loss = torch.sum(per_task_loss, dim=0)
+                    for i, t in enumerate(tasks):
+                        loss[t] = per_task_loss[i]
 
                 optimizer.zero_grad()
                 batch_loss.backward()
@@ -724,7 +766,10 @@ def train(args, exp_id, val_best):
             epoch_times.append(end_epoch - start_epoch)
             print('Epoch time: {:.6f}'.format(end_epoch-start_epoch))
             print('***** Weights Values *****')
-            print('\n'.join('\'{:s}\': {:.10f}'.format(k, scale[k]) for k in tasks))
+            try:
+                print('\n'.join('\'{:s}\': {:.10f}'.format(k, scale[k]) for k in tasks))
+            except NameError:
+                print('Per user adaptive weights')
             # print('bpr_loss:{:.6f}, user_disparity:{:.6f}, item_disparity:{:.6f}'.format(loss['1'].item(),
             #                                                                              loss['2'].item(),
             #                                                                              loss['3'].item()))

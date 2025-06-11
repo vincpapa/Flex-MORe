@@ -165,5 +165,27 @@ class NGCFModel(torch.nn.Module, ABC):
 
         return mf_loss
 
+    def custom_forward(self, user, pos, neg):
+        if self.node_dropout > 0:
+            sampled_adj = self.sparse_dropout(self.adj,
+                                              self.node_dropout,
+                                              self.adj.nnz())
+
+        if self.node_dropout > 0:
+            adj = sampled_adj
+        else:
+            adj = self.adj
+
+        gu, gi = self.propagate_embeddings(adj)
+        # user, pos, neg = batch
+        xu_pos, gamma_u, gamma_i_pos = self.compute_xui(inputs=(gu[user], gi[pos]))
+        xu_neg, _, gamma_i_neg = self.compute_xui(inputs=(gu[user], gi[neg]))
+        maxi = -1 * torch.nn.LogSigmoid()(xu_pos - xu_neg)
+        b = self.l_w * (1 / 2) * (torch.norm(gu[user], dim=1) ** 2)
+        c = self.l_w * (1 / 2) * (torch.norm(gi[pos], dim=1) ** 2)
+        d = self.l_w * (1 / 2) * (torch.norm(gi[neg], dim=1) ** 2)
+
+        return torch.mean(maxi + b + c + d), maxi + b + c + d
+
 
 
