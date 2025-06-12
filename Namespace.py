@@ -65,7 +65,7 @@ class Namespace:
                 pass
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
-        elif self.mo_method in ['ADAFLEXMORE', 'ADAFLEXMORE05','USERADAFLEXMORE']:
+        elif self.mo_method in ['ADAFLEXMORE','USERADAFLEXMORE']:
             self.atk = experiment['atk']
             try:
                 self.atk_con = experiment['atk']['atk_cons']
@@ -76,6 +76,25 @@ class Namespace:
             except KeyError:
                 pass
             self.ranker = experiment['ranker']
+        elif self.mo_method in ['PREFEADAFLEXMORE']:
+            self.atk = experiment['atk']
+            try:
+                self.atk_con = experiment['atk']['atk_cons']
+            except KeyError:
+                pass
+            try:
+                self.atk_pro = experiment['atk']['atk_prov']
+            except KeyError:
+                pass
+            self.ranker = experiment['ranker']
+            try:
+                self.pref_m = experiment['preferences']['m']
+            except KeyError:
+                pass
+            try:
+                self.pref_p = experiment['preferences']['p']
+            except KeyError:
+                pass
 
 
 

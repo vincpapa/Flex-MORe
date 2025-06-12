@@ -2,7 +2,7 @@ setting:
   data: facebook_books # Dataset
   gpu_id: 0 # GPU_ID
   baseline: NGCF # Base model
-  wrapper: ADAFLEXMORE05 # Multi-Objective Method
+  wrapper: PREFEADAFLEXMORE # Multi-Objective Method
   epochs: 300 # Number of epochs
   validation_rate: 10 # Period of evaluation during training
   validation_metric: ndcg@20 # Metric of evaluation during training
@@ -18,6 +18,7 @@ hyperparameters:
   message_dropout: [0.1]
   node_dropout: [0.1]
   normalize: [True]
+  preferences: [ { m: 1, p: 0.3 }, { m: 1, p: 0.5 } ]
 
 
 
