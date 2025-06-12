@@ -727,12 +727,12 @@ def train(args, exp_id, val_best):
                     if 'r' in args.mode:
                         sol.append(torch.square(loss['1']))
                     if 'm' in args.mode:
-                        if args.mo_method == 'ADAFLEMORE':
+                        if args.mo_method == 'ADAFLEXMORE':
                             sol.append(torch.square(1 - ndcg).mean())
                         else:
                             sol.append(torch.square(args.pref_m - ndcg).mean())
                     if 'p' in args.mode:
-                        if args.mo_method == 'ADAFLEMORE':
+                        if args.mo_method == 'ADAFLEXMORE':
                             sol.append(torch.square(1 - aplt).mean())
                         else:
                             sol.append(torch.square(args.pref_p - aplt).mean())
