@@ -2,7 +2,7 @@ setting:
   data: amazon_baby # Dataset
   gpu_id: 0 # GPU_ID
   baseline: NGCF # Base model
-  wrapper: PREFEADAFLEXMORE # Multi-Objective Method
+  wrapper: PREFEUSERADAFLEXMORE # Multi-Objective Method
   epochs: 300 # Number of epochs
   validation_rate: 10 # Period of evaluation during training
   validation_metric: ndcg@20 # Metric of evaluation during training
