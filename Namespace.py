@@ -76,7 +76,7 @@ class Namespace:
             except KeyError:
                 pass
             self.ranker = experiment['ranker']
-        elif self.mo_method in ['PREFEADAFLEXMORE']:
+        elif self.mo_method in ['PREFEADAFLEXMORE', 'PREFEUSERADAFLEXMORE']:
             self.atk = experiment['atk']
             try:
                 self.atk_con = experiment['atk']['atk_cons']
