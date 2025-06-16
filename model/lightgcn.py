@@ -109,11 +109,16 @@ class LightGCNModel(torch.nn.Module, ABC):
         # user, pos, neg = batch
         xu_pos = self.compute_xui(inputs=(gu[user], gi[pos]))
         xu_neg = self.compute_xui(inputs=(gu[user], gi[neg]))
-        loss = torch.mean(torch.nn.functional.softplus(xu_neg - xu_pos))
-        reg_loss = self.l_w * (1 / 2) * (self.Gu.weight[user].norm(2).pow(2) +
-                                         self.Gi.weight[pos].norm(2).pow(2) +
-                                         self.Gi.weight[neg].norm(2).pow(2)) / float(user.shape[0])
-        loss += reg_loss
+        maxi = torch.nn.LogSigmoid()(xu_pos - xu_neg)
+        mf_loss = -1 * torch.mean(maxi)
+        # mf_loss = -1 * torch.sum(maxi)
+        reg_loss = self.l_w * (1 / 2) * (torch.norm(gu[user]) ** 2
+                                         + torch.norm(gi[pos]) ** 2
+                                         + torch.norm(gi[neg]) ** 2) / len(user)
+        # reg_loss = self.l_w * (1 / 2) * (torch.norm(gu[user]) ** 2
+        #                                  + torch.norm(gi[pos]) ** 2
+        #                                  + torch.norm(gi[neg]) ** 2)  # / len(user)
+        mf_loss += reg_loss
 
         # self.optimizer.zero_grad()
         # loss.backward()
@@ -121,5 +126,16 @@ class LightGCNModel(torch.nn.Module, ABC):
 
         # return loss.detach().cpu().numpy()
 
-        return loss
+        return mf_loss
 
+    def custom_forward(self, user, pos, neg):
+        gu, gi = self.propagate_embeddings()
+        # user, pos, neg = batch
+        xu_pos = self.compute_xui(inputs=(gu[user], gi[pos]))
+        xu_neg = self.compute_xui(inputs=(gu[user], gi[neg]))
+        maxi = -1 * torch.nn.LogSigmoid()(xu_pos - xu_neg)
+        b = self.l_w * (1 / 2) * (torch.norm(gu[user], dim=1) ** 2)
+        c = self.l_w * (1 / 2) * (torch.norm(gi[pos], dim=1) ** 2)
+        d = self.l_w * (1 / 2) * (torch.norm(gi[neg], dim=1) ** 2)
+
+        return torch.mean(maxi + b + c + d), maxi + b + c + d
