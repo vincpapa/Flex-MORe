@@ -15,7 +15,7 @@ hyperparameters:
   l_2: [0.001]
   mode: [r] # Which loss to use
   scale: [1]
-  gamma: [3]
+  gamma: [0.1]
 
 
 
