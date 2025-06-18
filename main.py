@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 from model.mf import MatrixFactorization
 from model.lightgcn import LightGCNModel
 from model.ngcf import NGCFModel
+from model.direct_au import DirectAUModel
 from SoftRank import SmoothDCGLoss, SmoothRank
 from sampler import NegSampler, negsamp_vectorized_bsearch_preverif
 from min_norm_solvers import MinNormSolver, gradient_normalizers
@@ -295,6 +296,9 @@ def train(args, exp_id, val_best):
     elif args.backbone == 'NGCF':
         model = NGCFModel(user_size, item_size, args, dataset['train_matrix'])
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    elif args.backbone == 'DirectAU':
+        model = DirectAUModel(user_size, item_size, args)
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     else:
         print("Backbone not supported.")
         return -1
@@ -480,6 +484,8 @@ def train(args, exp_id, val_best):
                     elif args.backbone == 'LightGCN':
                         scores_all = model.predict(users)
                     elif args.backbone == 'NGCF':
+                        scores_all = model.predict(users)
+                    elif args.backbone == 'DirectAU':
                         scores_all = model.predict(users)
                     ranks_prov = ranker(scores_all)
                     if 'm' in args.mode:

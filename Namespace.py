@@ -18,6 +18,11 @@ class Namespace:
             self.dim = experiment['dim']
             self.lr = experiment['lr']
             self.weight_decay = experiment['l_2']
+        elif self.backbone == 'DirectAU':
+            self.dim = experiment['dim']
+            self.lr = experiment['lr']
+            self.weight_decay = experiment['l_2']
+            self.gamma = experiment['gamma']
         elif self.backbone == 'LightGCN':
             self.dim = experiment['dim']
             self.lr = experiment['lr']
