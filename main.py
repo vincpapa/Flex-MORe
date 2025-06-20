@@ -16,7 +16,7 @@ from model.direct_au import DirectAUModel
 from SoftRank import SmoothDCGLoss, SmoothRank
 from sampler import NegSampler, negsamp_vectorized_bsearch_preverif
 from min_norm_solvers import MinNormSolver, gradient_normalizers
-from eval_metrics import precision_at_k, recall_at_k, mapk, ndcg_k, idcg_k
+from eval_metrics import precision_at_k, recall_at_k, mapk, ndcg_k, idcg_k, ndcg_k_torch
 from preprocess import generate_rating_matrix, preprocessing
 import itertools
 from collections import Counter, OrderedDict
@@ -133,10 +133,10 @@ def generate_pred_list(model, train_matrix, topk=20):
     return pred_list, score_list, raw_score_list
 
 
-def compute_metrics(test_set, pred_list, metric):
+def compute_metrics(test_set, pred_list, metric, device=None):
     metric, k = metric.split('@')[0], int(metric.split('@')[1])
     if metric == 'ndcg':
-        return ndcg_k(test_set, pred_list, k)
+        return ndcg_k_torch(test_set, pred_list, k, device)
     elif metric == 'recall':
         return recall_at_k(test_set, pred_list, k)
     elif metric == 'precision':
@@ -186,8 +186,35 @@ def conv_mapping(mapping, x):
         if v == x:
             return k
 
+def rec_to_elliot(iter, top200_id, dataset, exp_string, data_name):
 
-def rec_to_elliot(iter, top200_id, dataset, exp_string):
+    num_users, top_k = top200_id.shape
+
+    users = np.repeat(np.arange(num_users), top_k)
+    items = top200_id.flatten()
+    scores = np.tile(np.arange(top_k, 0, -1), num_users)
+
+    df = pd.DataFrame({
+        'user': users,
+        'item': items,
+        'rating': scores
+    })
+
+    user_map = pd.Series(dataset['user_mapping_inv'])
+    item_map = pd.Series(dataset['item_mapping_inv'])
+
+    df['user'] = df['user'].map(user_map)
+    df['item'] = df['item'].map(item_map)
+    if df['user'].isnull().any() or df['item'].isnull().any():
+        raise ValueError("Failed Mapping. NaN")
+
+    output_dir = f'results/{data_name}/recs'
+    os.makedirs(output_dir, exist_ok=True)
+
+    df.to_csv(f'{output_dir}/{exp_string}_it={iter}_recs.tsv',
+              sep='\t', index=False, header=False)
+
+def rec_to_elliot_old(iter, top200_id, dataset, exp_string):
     rec_elliot = []
     for i in range(top200_id.shape[0]):
         for j in range(top200_id.shape[1]):
@@ -804,10 +831,10 @@ def train(args, exp_id, val_best):
                 pred_list, score_matrix, raw_score_matrix = generate_pred_list(model, train_matrix, topk=50)
                 # Save list of recommendation for later use
                 print('***** Saving list of recommendation *****')
-                rec_to_elliot(iter + 1, pred_list, dataset, exp_id)
+                rec_to_elliot(iter + 1, pred_list, dataset, exp_id , args.data)
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')
-                val_metric = compute_metrics(val_user_list, pred_list, args.metric)
+                val_metric = compute_metrics(val_user_list, pred_list, args.metric, args.device)
                 if args.mo_method == 'None':
                     if val_metric > val_best:
                         val_best = val_metric

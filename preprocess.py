@@ -537,6 +537,8 @@ def preprocessing(settings):
 
     df, train, test, val, user_mapping = convert_unique_idx(df, train, test, val, 'user')
     df, train, test, val, item_mapping = convert_unique_idx(df, train, test, val, 'item')
+    inv_user_map = {v: k for k, v in user_mapping.items()}
+    inv_item_map = {v: k for k, v in item_mapping.items()}
     df = df.reset_index().drop(['index'], axis=1)
     train = train.reset_index().drop(['index'], axis=1)
     test = test.reset_index().drop(['index'], axis=1)
@@ -570,7 +572,7 @@ def preprocessing(settings):
                'user_mapping': user_mapping, 'item_mapping': item_mapping,
                'train_matrix': train_matrix, 'val_matrix': val_matrix, 'test_matrix': test_matrix,
                'train_user_list': train_user_list, 'val_user_list': val_user_list, 'test_user_list': test_user_list,
-               'train_pair': train_pair}
+               'train_pair': train_pair, 'user_mapping_inv': inv_user_map, 'item_mapping_inv': inv_item_map}
 
     # index_F, index_M = gender_index(df)
     index_F, index_M = activity_index(df)

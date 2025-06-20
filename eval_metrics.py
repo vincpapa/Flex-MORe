@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import torch
 
 
 def precision_at_k_per_sample(actual, predicted, topk):
@@ -96,6 +97,37 @@ def idcg_k(k):
     res = np.sum(1.0 / np.log2(np.arange(2, k + 2)))
     return res if res > 0 else 1.0
 
+
+def ndcg_k_torch(actual, predicted, topk, device=None):
+    if device is None:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    num_users = len(actual)
+    max_act_len = max(len(a) for a in actual)
+
+    actual_mat = torch.full((num_users, max_act_len), -1, dtype=torch.long, device=device)
+    pred_mat = torch.full((num_users, topk), -1, dtype=torch.long, device=device)
+
+    for i, (a, p) in enumerate(zip(actual, predicted)):
+        actual_mat[i, :len(a)] = torch.tensor(a, dtype=torch.long, device=device)
+        pred_mat[i, :min(len(p), topk)] = torch.tensor(p[:topk], dtype=torch.long, device=device)
+
+    relevance = (pred_mat.unsqueeze(-1) == actual_mat.unsqueeze(1)).any(-1).float()
+
+    log_pos = 1.0 / torch.log2(torch.arange(2, topk + 2, device=device, dtype=torch.float))
+    dcg = (relevance * log_pos).sum(dim=1)
+
+    ideal_len = torch.tensor([min(len(a), topk) for a in actual], device=device)
+    cum_log_pos = torch.cumsum(log_pos, dim=0)  # shape (topk,)
+    idx = torch.clamp(ideal_len, min=1) - 1
+    idcg = torch.where(
+        ideal_len > 0,
+        cum_log_pos[idx],
+        torch.ones_like(ideal_len, dtype=torch.float)  # evitiamo /0 per chi non ha item rilevanti
+    )
+
+    ndcg = (dcg / idcg).mean().item()
+    return ndcg
 
 def ndcg_k(actual, predicted, topk):
     total_ndcg = 0.0
