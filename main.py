@@ -16,7 +16,7 @@ from model.direct_au import DirectAUModel
 from SoftRank import SmoothDCGLoss, SmoothRank
 from sampler import NegSampler, negsamp_vectorized_bsearch_preverif
 from min_norm_solvers import MinNormSolver, gradient_normalizers
-from eval_metrics import precision_at_k, recall_at_k, mapk, ndcg_k, idcg_k, ndcg_k_torch
+from eval_metrics import precision_at_k, recall_at_k, mapk, ndcg_k, idcg_k
 from preprocess import generate_rating_matrix, preprocessing
 import itertools
 from collections import Counter, OrderedDict
@@ -136,7 +136,7 @@ def generate_pred_list(model, train_matrix, topk=20):
 def compute_metrics(test_set, pred_list, metric, device=None):
     metric, k = metric.split('@')[0], int(metric.split('@')[1])
     if metric == 'ndcg':
-        return ndcg_k_torch(test_set, pred_list, k, device)
+        return ndcg_k(test_set, pred_list, k)
     elif metric == 'recall':
         return recall_at_k(test_set, pred_list, k)
     elif metric == 'precision':
