@@ -129,7 +129,30 @@ def ndcg_k_torch(actual, predicted, topk, device=None):
     ndcg = (dcg / idcg).mean().item()
     return ndcg
 
+
 def ndcg_k(actual, predicted, topk):
+    num_users = len(actual)
+
+    # Step 1: Padding e costruzione array 2D
+    pred_mat = np.full((num_users, topk), -1, dtype=int)  # -1 = item fittizio
+    rel_mat = np.zeros((num_users, topk), dtype=np.float32)
+
+    for i, (a, p) in enumerate(zip(actual, predicted)):
+        k = min(topk, len(p))
+        pred_mat[i, :k] = p[:k]
+        actual_set = set(a)
+        rel_mat[i, :k] = [1.0 if item in actual_set else 0.0 for item in p[:k]]
+
+    log_pos = 1.0 / np.log2(np.arange(2, topk + 2))
+    dcg = np.sum(rel_mat * log_pos, axis=1)
+
+    ideal_len = np.array([min(len(a), topk) for a in actual])
+    idcg = np.array([np.sum(log_pos[:l]) if l > 0 else 1.0 for l in ideal_len])
+
+    ndcg = dcg / idcg
+    return np.mean(ndcg)
+
+def ndcg_k_mid(actual, predicted, topk):
     total_ndcg = 0.0
     for user_actual, user_pred in zip(actual, predicted):
         actual_set = set(user_actual)
@@ -147,6 +170,7 @@ def ndcg_k(actual, predicted, topk):
 
     return total_ndcg / len(actual)
 
+'''
 def ndcg_k_old(actual, predicted, topk):
     res = 0
     for user_id in range(len(actual)):
@@ -165,6 +189,7 @@ def idcg_k_old(k):
     else:
         return res
 
+
 # build ndcg_list for each user
 def ndcg_list(actual, predicted, topk):
     res = []
@@ -175,6 +200,7 @@ def ndcg_list(actual, predicted, topk):
         res.append(dcg_k / idcg)
         # res.append(dcg_k)
     return res
+'''
 
 
 if __name__ == '__main__':
