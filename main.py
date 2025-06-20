@@ -33,6 +33,7 @@ from imle.aimle import aimle
 from imle.target import AdaptiveTargetDistribution, TargetDistribution
 from torch.nn import Sigmoid
 from epo_lp import EPO_LP
+from early_stopping import EarlyStopping
 
 
 def rank(seq: Tensor) -> Tensor:
@@ -304,6 +305,7 @@ def train(args, exp_id, val_best):
     # pre-sample a small set of negative samples
     evaluation = True
     t1 = time.time()
+    early_stopping = EarlyStopping(patience=args.patience, verbose=True)
     user_neg_items = neg_item_pre_sampling(train_matrix, num_neg_candidates=500)
     pre_samples = {'user_neg_items': user_neg_items}
 
@@ -849,6 +851,12 @@ def train(args, exp_id, val_best):
                 # precision, recall, MAP, ndcg = compute_metrics(val_user_list, pred_list, topk=20)
                 print(f'Validation metric: {args.metric}, Value: {val_metric}')
                 validation_scores.append((iter + 1, val_metric))
+                if args.backbone == 'DirectAU':
+                    early_stopping.check_early_stop(val_metric)
+
+                    if early_stopping.stop_training:
+                        print(f"Early stopping at epoch {iter}")
+                        break
                 # print('VAL Precision:', precision)
                 # print('VAL Recall:', recall)
                 # print('VAL MAP:', MAP)

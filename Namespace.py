@@ -23,6 +23,7 @@ class Namespace:
             self.lr = experiment['lr']
             self.weight_decay = experiment['l_2']
             self.gamma = experiment['gamma']
+            self.patience = experiment['patience']
         elif self.backbone == 'LightGCN':
             self.dim = experiment['dim']
             self.lr = experiment['lr']
