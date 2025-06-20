@@ -834,7 +834,7 @@ def train(args, exp_id, val_best):
                 rec_to_elliot(iter + 1, pred_list, dataset, exp_id , args.data)
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')
-                val_metric = compute_metrics(val_user_list, pred_list, args.metric, args.device)
+                val_metric = compute_metrics(val_user_list, pred_list, args.metric)
                 if args.mo_method == 'None':
                     if val_metric > val_best:
                         val_best = val_metric
