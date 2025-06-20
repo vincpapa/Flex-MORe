@@ -133,7 +133,7 @@ def generate_pred_list(model, train_matrix, topk=20):
     return pred_list, score_list, raw_score_list
 
 
-def compute_metrics(test_set, pred_list, metric, device=None):
+def compute_metrics(test_set, pred_list, metric):
     metric, k = metric.split('@')[0], int(metric.split('@')[1])
     if metric == 'ndcg':
         return ndcg_k(test_set, pred_list, k)
