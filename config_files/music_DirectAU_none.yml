@@ -3,8 +3,8 @@ setting:
   gpu_id: 1 # GPU_ID
   baseline: DirectAU # Base model
   wrapper: None # Multi-Objective Method
-  epochs: 200 # Number of epochs
-  validation_rate: 1 # Period of evaluation during training
+  epochs: 100 # Number of epochs
+  validation_rate: 5 # Period of evaluation during training
   validation_metric: ndcg@20 # Metric of evaluation during training
   batch_size: 2048 # Batch size
 hyperparameters:
