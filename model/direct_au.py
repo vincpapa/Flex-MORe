@@ -60,10 +60,10 @@ class DirectAUModel(nn.Module):
         # reg_loss = self.l_w * (torch.norm(user_emb) ** 2
         #                        + torch.norm(pos_emb) ** 2
         #                        + torch.norm(neg_emb) ** 2)  # / len(user_emb)
-        reg_loss = self.l_w * (torch.norm(user_emb) ** 2
-                               + torch.norm(pos_emb) ** 2) / len(user_emb)
+        # reg_loss = self.l_w * (torch.norm(user_emb) ** 2
+        #                        + torch.norm(pos_emb) ** 2) / len(user_emb)
 
-        return direct_au_loss + reg_loss
+        return direct_au_loss # + reg_loss
         # return bpr_loss
 
     def custom_forward(self, user_id, pos_id, neg_id):

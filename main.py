@@ -298,7 +298,7 @@ def train(args, exp_id, val_best):
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     elif args.backbone == 'DirectAU':
         model = DirectAUModel(user_size, item_size, args)
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     else:
         print("Backbone not supported.")
         return -1
