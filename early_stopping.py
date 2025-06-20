@@ -7,7 +7,7 @@ class EarlyStopping:
         self.stop_training = False
 
     def check_early_stop(self, val_metric):
-        if self.best_val is None or val_metric < self.best_val:
+        if self.best_val is None or val_metric > self.best_val:
             self.best_val = val_metric
             self.no_improvement_count = 0
         else:
