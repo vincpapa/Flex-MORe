@@ -92,18 +92,41 @@ def mapk(actual, predicted, k=10):
     return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
 
 
+def idcg_k(k):
+    res = np.sum(1.0 / np.log2(np.arange(2, k + 2)))
+    return res if res > 0 else 1.0
+
+
 def ndcg_k(actual, predicted, topk):
+    total_ndcg = 0.0
+    for user_actual, user_pred in zip(actual, predicted):
+        actual_set = set(user_actual)
+        pred_topk = user_pred[:topk]
+
+        relevance = np.array([1 if item in actual_set else 0 for item in pred_topk])
+
+        denom = np.log2(np.arange(2, len(relevance) + 2))
+        dcg = np.sum(relevance / denom)
+
+        ideal_k = min(topk, len(actual_set))
+        idcg = idcg_k(ideal_k)
+
+        total_ndcg += dcg / idcg
+
+    return total_ndcg / len(actual)
+
+def ndcg_k_old(actual, predicted, topk):
     res = 0
     for user_id in range(len(actual)):
         k = min(topk, len(actual[user_id]))
-        idcg = idcg_k(k)
+        idcg = idcg_k_old(k)
         dcg_k = sum([int(predicted[user_id][j] in set(actual[user_id])) / math.log(j+2, 2) for j in range(topk)])
         res += dcg_k / idcg
     return res / float(len(actual))
 
 
 # Calculates the ideal discounted cumulative gain at k
-def idcg_k(k):
+def idcg_k_old(k):
     res = sum([1.0/math.log(i+2, 2) for i in range(k)])
     if not res:
         return 1.0
@@ -115,7 +138,7 @@ def ndcg_list(actual, predicted, topk):
     res = []
     for user_id in range(len(actual)):
         k = min(topk, len(actual[user_id]))
-        idcg = idcg_k(k)
+        idcg = idcg_k_old(k)
         dcg_k = sum([int(predicted[user_id][j] in set(actual[user_id])) / math.log(j+2, 2) for j in range(topk)])
         res.append(dcg_k / idcg)
         # res.append(dcg_k)

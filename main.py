@@ -800,8 +800,10 @@ def train(args, exp_id, val_best):
             if (iter + 1) % args.every == 0 and evaluation == True:
                 model.eval()
                 # Generate list of recommendation
+                print('***** Generate list of recommendation *****')
                 pred_list, score_matrix, raw_score_matrix = generate_pred_list(model, train_matrix, topk=50)
                 # Save list of recommendation for later use
+                print('***** Saving list of recommendation *****')
                 rec_to_elliot(iter + 1, pred_list, dataset, exp_id)
                 # Keep track of performance on Validation Set to establish best epoch
                 print('***** Accuracy performance on Validation Set *****')

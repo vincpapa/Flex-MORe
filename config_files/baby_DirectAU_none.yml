@@ -4,7 +4,7 @@ setting:
   baseline: DirectAU # Base model
   wrapper: None # Multi-Objective Method
   epochs: 300 # Number of epochs
-  validation_rate: 10 # Period of evaluation during training
+  validation_rate: 1 # Period of evaluation during training
   validation_metric: ndcg@20 # Metric of evaluation during training
   batch_size: 2048 # Batch size
 hyperparameters:
