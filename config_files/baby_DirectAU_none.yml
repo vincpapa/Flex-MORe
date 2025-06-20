@@ -17,7 +17,7 @@ hyperparameters:
   mode: [r] # Which loss to use
   scale: [1]
   gamma: [0.2, 0.5, 2, 5, 10]
-  patience: [5]
+  patience: [10]
 
 
 
