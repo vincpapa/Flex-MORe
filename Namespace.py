@@ -101,6 +101,26 @@ class Namespace:
                 self.pref_p = experiment['preferences']['p']
             except KeyError:
                 pass
+        elif self.mo_method == 'PREFESCALEFLEXMORE':
+            self.atk = experiment['atk']
+            try:
+                self.atk_con = experiment['atk']['atk_cons']
+            except KeyError:
+                pass
+            try:
+                self.atk_pro = experiment['atk']['atk_prov']
+            except KeyError:
+                pass
+            self.ranker = experiment['ranker']
+            try:
+                self.pref_m = experiment['preferences']['m']
+            except KeyError:
+                pass
+            try:
+                self.pref_p = experiment['preferences']['p']
+            except KeyError:
+                pass
+            # self.scale1 = experiment['scale']
 
 
 
