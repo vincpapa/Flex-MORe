@@ -19,7 +19,7 @@ for dataset in datasets:
                             store_validation = pickle.load(handle)
                         for k, v in list(store_validation.items()):
                             # if scale not in k:
-                            if f'acc_bias={bias}' in k:
+                            if f'accbias={bias}' in k:
                                 del store_validation[k]
                         for k, v in store_validation.items():
                             store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
