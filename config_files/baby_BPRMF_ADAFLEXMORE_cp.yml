@@ -12,6 +12,7 @@ hyperparameters:
   lr: [ 0.005, 0.001, 0.0005 ] # Learning rate
   l_2: [ 0.01, 0.005, 0.001 ] #L2 penalty
   accbias: [0.25, 0.5, 0.75, 0.95]
+  bias_version: [2]
   # lr: [ 0.005 ] # Learning rate
   # l_2: [0.001 ] #L2 penalty
   mode: [ rpm ] # Which loss to use

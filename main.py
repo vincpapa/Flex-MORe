@@ -767,7 +767,10 @@ def train(args, exp_id, val_best):
                 elif args.mo_method in ['PREFEADAFLEXMORE','ADAFLEXMORE']:
                     sol = []
                     if 'r' in args.mode:
-                        sol.append(torch.square(loss['1']) + torch.square(loss['1']) * args.accbias)
+                        if args.bias_version == 1:
+                            sol.append(torch.square(loss['1']) + torch.square(loss['1']) * args.accbias)
+                        else:
+                            sol.append(torch.square(loss['1']) + args.accbias)
                     if 'm' in args.mode:
                         if args.mo_method == 'ADAFLEXMORE':
                             sol.append(torch.square(1 - ndcg).mean())
