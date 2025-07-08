@@ -5,7 +5,7 @@ import os
 
 
 datasets = ['facebook_books'] # ['amazon_music'] # ['amazon_baby', 'facebook_books']
-backbones = ['NGCF'] # ['BPRMF','NGCF','LightGCN']
+backbones = ['NGCF', 'BPRMF'] # ['BPRMF','NGCF','LightGCN']
 method = '=ADAFLEXMORE'
 biases = ['0$25', '0$5'] # , '0$75', '0$95'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
 for dataset in datasets:
@@ -19,7 +19,7 @@ for dataset in datasets:
                             store_validation = pickle.load(handle)
                         for k, v in list(store_validation.items()):
                             # if scale not in k:
-                            if f'accbias={bias}' not in k:
+                            if f'accbias={bias}' not in k and 'bias_version=2' not in k:
                                 del store_validation[k]
                         for k, v in store_validation.items():
                             store_validation[k] = sorted(v, key=lambda x: x[1], reverse=True)[0]
