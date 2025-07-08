@@ -775,12 +775,18 @@ def train(args, exp_id, val_best):
                         if args.mo_method == 'ADAFLEXMORE':
                             sol.append(torch.square(1 - ndcg).mean())
                         else:
-                            sol.append(torch.square(args.pref_m - ndcg).mean())
+                            if (args.pref_m - ndcg).mean() > 0:
+                                sol.append(torch.square(args.pref_m - ndcg).mean())
+                            else:
+                                sol.append(torch.tensor(0))
                     if 'p' in args.mode:
                         if args.mo_method == 'ADAFLEXMORE':
                             sol.append(torch.square(1 - aplt).mean())
                         else:
-                            sol.append(torch.square(args.pref_p - aplt).mean())
+                            if (args.pref_p - aplt).mean() > 0:
+                                sol.append(torch.square(args.pref_p - aplt).mean())
+                            else:
+                                sol.append(torch.tensor(0))
                     sol = F.softmax(torch.tensor(sol), dim=0)
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])

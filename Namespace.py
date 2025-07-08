@@ -86,6 +86,8 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method in ['PREFEADAFLEXMORE', 'PREFEUSERADAFLEXMORE']:
             self.atk = experiment['atk']
+            self.accbias = experiment['accbias']
+            self.bias_version = experiment['bias_version']
             try:
                 self.atk_con = experiment['atk']['atk_cons']
             except KeyError:
