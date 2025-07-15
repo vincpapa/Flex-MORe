@@ -784,12 +784,14 @@ def train(args, exp_id, val_best):
                                 sol.append(torch.square(args.pref_p - aplt).mean())
                             else:
                                 sol.append(torch.tensor(0))
-                    sol_tensor = torch.tensor(sol)
-                    mask = sol_tensor != 0
-                    masked_sol = sol_tensor.clone()
-                    masked_sol[~mask] = float('-inf')
-                    sol = F.softmax(masked_sol, dim=0)
-                    # sol = F.softmax(torch.tensor(sol), dim=0)
+                    if args.mo_method == 'PREFEADAFLEXMORE':
+                        sol_tensor = torch.tensor(sol)
+                        mask = sol_tensor != 0
+                        masked_sol = sol_tensor.clone()
+                        masked_sol[~mask] = float('-inf')
+                        sol = F.softmax(masked_sol, dim=0)
+                    else:
+                        sol = F.softmax(torch.tensor(sol), dim=0)
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
                 elif args.mo_method in ['PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE']:
