@@ -74,7 +74,6 @@ class Namespace:
         elif self.mo_method in ['ADAFLEXMORE','USERADAFLEXMORE']:
             self.atk = experiment['atk']
             self.accbias = experiment['accbias']
-            self.bias_version = experiment['bias_version']
             try:
                 self.atk_con = experiment['atk']['atk_cons']
             except KeyError:
