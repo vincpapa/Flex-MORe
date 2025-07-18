@@ -4,8 +4,8 @@ import shutil
 import os
 
 
-datasets = ['facebook_books', 'amazon_baby'] # ['amazon_music'] # ['amazon_baby', 'facebook_books']
-backbones = ['NGCF', 'BPRMF'] # ['BPRMF','NGCF','LightGCN']
+datasets = ['amazon_music'] # ['amazon_music'] # ['amazon_baby', 'facebook_books']
+backbones = ['BPRMF'] # ['BPRMF','NGCF','LightGCN']
 method = 'PREFEADAFLEXMORE'
 scales = ['0$25', '0$5'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
 for dataset in datasets:
