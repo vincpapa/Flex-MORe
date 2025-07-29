@@ -60,7 +60,7 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
-        elif self.mo_method in ['FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ', 'FLEXMORE_EPO', 'CALFLEXMORE']:
+        elif self.mo_method in ['FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ', 'FLEXMORE_EPO']:
             try:
                 self.atk_con = experiment['atk']['atk_cons']
             except KeyError:
