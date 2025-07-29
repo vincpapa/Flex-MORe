@@ -356,7 +356,7 @@ def train(args, exp_id, val_best):
     grads = {}
     tasks = []
 
-    if args.mo_method in ['PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE','PREFEADAFLEXMORE', 'ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+    if args.mo_method in ['CALFLEXMORE','PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE','PREFEADAFLEXMORE', 'ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
         if 'r' in args.mode:
             tasks.append('1')
         if 's' in args.mode:
@@ -508,7 +508,7 @@ def train(args, exp_id, val_best):
                     loss['1'] = torch.tensor(0)
 
                 # Weighted Metric Method
-                if args.mo_method in ['PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE','PREFEADAFLEXMORE','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
+                if args.mo_method in ['CALFLEXMORE','PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE','PREFEADAFLEXMORE','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ']:
                     if args.backbone == 'BPRMF':
                         scores_all = model.myparameters[0].mm(model.myparameters[1].t())
                     elif args.backbone == 'LightGCN':
@@ -575,13 +575,16 @@ def train(args, exp_id, val_best):
                                 user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
                                 loss['3'] = (torch.square(user_aplt - raplt)).sum()
                             else:
-                                if args.mo_method in ['PREFESCALEFLEXMORE','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE','PREFEADAFLEXMORE','FLEXMORE_ABL_WOS','FLEXMORE_ABL_WOZ']:
+                                if args.mo_method in ['CALFLEXMORE','PREFESCALEFLEXMORE','ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE','PREFEADAFLEXMORE','FLEXMORE_ABL_WOS','FLEXMORE_ABL_WOZ']:
                                     aplt = compute_differentiable_aplt(unique_u, ranks_prov, args, long_tail)
                                 else:
                                     aplt = compute_differentiable_aplt(user_id, ranks_prov, args, long_tail)
 
                                 if args.mo_method in ['ADAFLEXMORE','FLEXMORE_MGDA', 'FLEXMORE_EPO', 'FLEXMORE_SCALE']:
                                     loss['3'] = normalize_loss(torch.square(1 - aplt)).sum()
+                                elif args.mo_method in ['CALFLEXMORE']:
+                                    user_aplt = torch.FloatTensor(train_aplt).to(args.device)[unique_u]
+                                    loss['3'] = normalize_loss(torch.square(user_aplt - aplt)).sum()
                                 elif args.mo_method in ['USERADAFLEXMORE']:
                                     user_w.append(torch.square(1 - aplt))
                                     user_val.append(normalize_loss(torch.square(1 - aplt)))
@@ -794,7 +797,7 @@ def train(args, exp_id, val_best):
                         sol = F.softmax(torch.tensor(sol), dim=0)
                     for i, t in enumerate(tasks):
                         scale[t] = float(sol[i])
-                elif args.mo_method in ['PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE']:
+                elif args.mo_method in ['CALFLEXMORE','PREFESCALEFLEXMORE','PREFEUSERADAFLEXMORE','USERADAFLEXMORE']:
                     scale = {'1': 1.0, '2': 1.0, '3': 1.0, '4': 1.0}
                 else:
                     scale = {'1': args.scale1, '2': 1.0 - args.scale1, '3': 1.0 - args.scale1, '4': 1.0 - args.scale1}
@@ -989,6 +992,12 @@ if __name__ == '__main__':
     '''
     dataset, index_F, index_M, genre_mask, popular_dict, vec_pop, long_tail, short_head, train_aplt, train_user_tail_list = preprocessing(
         settings)
+    # train_aplt_df = []
+    # for i, u in enumerate(train_aplt):
+    #     train_aplt_df.append([dataset['user_mapping_inv'][i], u])
+    # train_aplt_df = pd.DataFrame(train_aplt_df)
+    # train_aplt_df.to_csv(f'results/{settings["data"]}/train_aplt_df.tsv', sep='\t', index=False, header=False)
+
     genre_mask = genre_mask.to(device)
     popular_tuple = OrderedDict(sorted(popular_dict.items()))
     popular_list = [x[1] for x in popular_tuple.items()]
