@@ -6,12 +6,12 @@ import os
 
 datasets = ['amazon_music'] # ['amazon_baby', 'facebook_books']
 backbones = ['BPRMF','NGCF']
-method = 'FLEXMORE_EPO'
+method = 'AMORE_EPO'
 scales = ['0$95'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
 for dataset in datasets:
     for backbone in backbones:
         for scale in scales:
-            if method == 'FLEXMORE_EPO':
+            if method == 'AMORE_EPO':
 
                 for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpm*'):
                     with open(file, 'rb') as handle:

@@ -1,4 +1,6 @@
 import torch
+
+
 class Namespace:
     def __init__(self, settings, experiment):
         self.data = settings['data']
@@ -39,7 +41,7 @@ class Namespace:
             self.node_dropout = experiment['node_dropout']
             self.normalize = experiment['normalize']
 
-        if self.mo_method == 'FLEXMORE_MGDA':
+        if self.mo_method == 'AMORE_MGDA':
             self.atk = experiment['atk']
             self.type = experiment['g_n']
             self.ranker = experiment['ranker']
@@ -60,7 +62,7 @@ class Namespace:
             self.ranker = experiment['ranker']
         elif self.mo_method == 'None':
             self.scale1 = experiment['scale']
-        elif self.mo_method in ['FLEXMORE_SCALE', 'FLEXMORE_ABL', 'FLEXMORE_ABL_WOS', 'FLEXMORE_ABL_WOZ', 'FLEXMORE_EPO']:
+        elif self.mo_method in ['AMORE_SCALE', 'AMORE_ABL', 'AMORE_ABL_WOS', 'AMORE_ABL_WOZ', 'AMORE_EPO']:
             try:
                 self.atk_con = experiment['atk']['atk_cons']
             except KeyError:
@@ -71,80 +73,6 @@ class Namespace:
                 pass
             self.ranker = experiment['ranker']
             self.scale1 = experiment['scale']
-        elif self.mo_method in ['CALFLEXMORE']:
-            try:
-                self.atk_con = experiment['atk']['atk_cons']
-            except KeyError:
-                pass
-            try:
-                self.atk_pro = experiment['atk']['atk_prov']
-            except KeyError:
-                pass
-            self.ranker = experiment['ranker']
-        elif self.mo_method in ['ADAFLEXMORE','USERADAFLEXMORE']:
-            self.atk = experiment['atk']
-            self.accbias = experiment['accbias']
-            try:
-                self.atk_con = experiment['atk']['atk_cons']
-            except KeyError:
-                pass
-            try:
-                self.atk_pro = experiment['atk']['atk_prov']
-            except KeyError:
-                pass
-            self.ranker = experiment['ranker']
-        elif self.mo_method in ['PREFEADAFLEXMORE', 'PREFEUSERADAFLEXMORE']:
-            self.atk = experiment['atk']
-            self.accbias = experiment['accbias']
-            try:
-                self.atk_con = experiment['atk']['atk_cons']
-            except KeyError:
-                pass
-            try:
-                self.atk_pro = experiment['atk']['atk_prov']
-            except KeyError:
-                pass
-            self.ranker = experiment['ranker']
-            try:
-                self.pref_m = experiment['preferences']['m']
-            except KeyError:
-                pass
-            try:
-                self.pref_p = experiment['preferences']['p']
-            except KeyError:
-                pass
-        elif self.mo_method == 'PREFESCALEFLEXMORE':
-            self.atk = experiment['atk']
-            try:
-                self.atk_con = experiment['atk']['atk_cons']
-            except KeyError:
-                pass
-            try:
-                self.atk_pro = experiment['atk']['atk_prov']
-            except KeyError:
-                pass
-            self.ranker = experiment['ranker']
-            try:
-                self.pref_m = experiment['preferences']['m']
-            except KeyError:
-                pass
-            try:
-                self.pref_p = experiment['preferences']['p']
-            except KeyError:
-                pass
-            # self.scale1 = experiment['scale']
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

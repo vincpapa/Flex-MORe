@@ -6,12 +6,12 @@ import os
 
 datasets = ['amazon_music'] # ['amazon_baby', 'facebook_books']
 backbones = ['BPRMF','NGCF']
-method = 'FLEXMORE_MGDA'
+method = 'AMORE_MGDA'
 seeds = ['7', '82', '185'] # ['0$25', '0$3', '0$4', '0$5', '0$6', '0$7', '0$75']
 for dataset in datasets:
     for backbone in backbones:
         for seed in seeds:
-            if method == 'FLEXMORE_MGDA':
+            if method == 'AMORE_MGDA':
 
                 for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpm*'):
                     with open(file, 'rb') as handle:

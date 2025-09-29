@@ -6,12 +6,12 @@ import os
 
 datasets = ['amazon_baby', 'facebook_books']
 backbones = ['BPRMF']
-method = 'FLEXMORE_SCALE'
+method = 'AMORE_SCALE'
 scales = ['0$25', '0$5', '0$75', '0$95']
 for dataset in datasets:
     for backbone in backbones:
         for scale in scales:
-            if method == 'FLEXMORE_SCALE':
+            if method == 'AMORE_SCALE':
                 for file in glob.glob(f'results/{dataset}/performance/*{backbone}*{method}*'):
                     with open(file, 'rb') as handle:
                         store_validation = pickle.load(handle)
@@ -34,7 +34,7 @@ for dataset in datasets:
                         dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                         shutil.copyfile(loss, dst_loss)
 
-            if method == 'FLEXMORE_SCALE':
+            if method == 'AMORE_SCALE':
 
                 for file in glob.glob(f'results/{dataset}/performance/*{backbone}*{method}*'):
                     with open(file, 'rb') as handle:

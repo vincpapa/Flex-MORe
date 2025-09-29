@@ -6,7 +6,7 @@ import os
 
 datasets = ['amazon_baby', 'amazon_music', 'facebook_books']
 backbone = 'BPRMF'
-method = 'FLEXMORE'
+method = 'AMORE'
 for dataset in datasets:
     if method == 'None':
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*None*'):
@@ -48,7 +48,7 @@ for dataset in datasets:
             dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
             shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
             with open(file, 'rb') as handle:
@@ -73,9 +73,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*AMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -98,9 +98,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*AMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -123,9 +123,9 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
-        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*FLEXMORE*rpms*'):
+        for file in glob.glob(f'results/{dataset}/performance/*{backbone}*AMORE*rpms*'):
             with open(file, 'rb') as handle:
                 store_validation = pickle.load(handle)
 
@@ -148,7 +148,7 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpms*'):
             with open(file, 'rb') as handle:
@@ -173,7 +173,7 @@ for dataset in datasets:
                 dst_loss = f'results/{dataset}/best_recs/{maxKey}_it={maximumValue[0]}_loss.pkl'
                 shutil.copyfile(loss, dst_loss)
 
-    if method == 'FLEXMORE':
+    if method == 'AMORE':
 
         for file in glob.glob(f'results/{dataset}/performance/*{backbone}*rpm_*'):
             with open(file, 'rb') as handle:
